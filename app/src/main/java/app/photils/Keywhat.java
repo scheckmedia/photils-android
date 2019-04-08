@@ -258,6 +258,9 @@ public class Keywhat extends Fragment {
             return;
 
         ProgressBar pb = getView().findViewById(R.id.keywhat_progress);
+        ViewGroup.LayoutParams params = pb.getLayoutParams();
+        params.height = 20;
+        pb.setLayoutParams(params);
         pb.setVisibility(View.VISIBLE);
 
         new Thread(() -> {
@@ -277,6 +280,10 @@ public class Keywhat extends Fragment {
 
                 updateTagCloud();
                 pb.setVisibility(View.INVISIBLE);
+
+                params.height = 0;
+                pb.setLayoutParams(params);
+
                 return null;
             };
 
