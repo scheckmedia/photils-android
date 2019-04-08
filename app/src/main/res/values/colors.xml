@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#b93c3c</color>
+    <color name="colorPrimaryDark">#830016</color>
+    <color name="colorAccent">#f06d67</color>
+    <color name="photilsDarkBackground">#303030</color>
+    <color name="photilsDarkButton">#424242</color>
+    <color name="photilsRed">#b93c3c</color>
+    <color name="photilsDarkRed">#b83c40</color>
+    <color name="photilsDarkRedTransperent">#FF644242</color>
+    <color name="photilsText">#fff</color>
+</resources>
