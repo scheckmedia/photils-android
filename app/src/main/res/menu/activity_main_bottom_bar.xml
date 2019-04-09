@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_keywhat"
+        android:icon="@drawable/ic_local_offer_black_24dp"
+        android:title="@string/menu_keywhat" />
+
+</menu>

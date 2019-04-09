@@ -76,39 +76,11 @@
             android:id="@+id/keywhat_cb_hashtag"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="8dp"
             android:buttonTint="@color/photilsText"
             android:textColor="@color/photilsText"
             android:textSize="24sp"
-            app:layout_constraintEnd_toStartOf="@+id/keywhat_btn_copy" />
-
-        <android.support.design.button.MaterialButton
-            android:id="@+id/keywhat_btn_copy"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-            android:layout_width="40dp"
-            android:layout_height="60dp"
-            android:layout_marginEnd="4dp"
-            android:gravity="center"
-            app:icon="@drawable/ic_content_copy_black_24dp"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconTint="@color/photilsText"
-            app:layout_constraintEnd_toStartOf="@+id/keywhat_btn_share"
-            app:strokeWidth="0dp" />
-
-        <android.support.design.button.MaterialButton
-            android:id="@+id/keywhat_btn_share"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="40dp"
-            android:layout_height="60dp"
-            android:padding="0dp"
-            app:icon="@drawable/ic_share_black_24dp"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="30dp"
-            app:iconTint="@color/photilsText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:strokeWidth="0dp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 
