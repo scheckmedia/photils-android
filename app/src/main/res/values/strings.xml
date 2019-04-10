@@ -10,7 +10,6 @@
 
     <string name="menu_keywhat">Keywhat</string>
     <string name="keywhat_share">Get Hashtags</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="keywhat_copy_success">The hashtags has been copied to clipboard.</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
 </resources>

@@ -56,31 +56,23 @@
             android:textAlignment="viewStart"
             android:textColor="@color/photilsText"
             android:textSize="30sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="#"
-            android:textColor="@color/photilsText"
-            android:textSize="30sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/keywhat_cb_hashtag"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <CheckBox
             android:id="@+id/keywhat_cb_hashtag"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
-            android:layout_marginEnd="8dp"
             android:buttonTint="@color/photilsText"
+            android:text="#"
             android:textColor="@color/photilsText"
             android:textSize="24sp"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 

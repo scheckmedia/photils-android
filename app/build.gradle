@@ -16,7 +16,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets { main { assets.srcDirs = ['src/keyhwat_actions/assets', 'src/keyhwat_actions/assets/'] } }
+    sourceSets {
+        main { assets.srcDirs = ['src/keyhwat_actions/assets', 'src/keyhwat_actions/assets/'] }
+    }
 
     aaptOptions {
         noCompress "tflite"

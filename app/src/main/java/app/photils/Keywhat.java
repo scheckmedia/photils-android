@@ -2,11 +2,15 @@ package app.photils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -26,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.adroitandroid.chipcloud.ChipCloud;
 import com.adroitandroid.chipcloud.ChipListener;
@@ -34,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -58,8 +64,9 @@ public class Keywhat extends Fragment implements ChipListener {
     final static int inputSize = 256;
     final ArrayList<String> tags = new ArrayList<>();
 
-    private ArrayList<Integer> selectedTags = new ArrayList<>();
+    private HashSet<String> selectedTags = new HashSet<>();
     private ChipCloud cloud;
+    private Uri currentMediaPath = null;
 
     public Keywhat() {
         // Required empty public constructor
@@ -82,23 +89,51 @@ public class Keywhat extends Fragment implements ChipListener {
 
         if(requestCode == IMAGE_SELECTION_RESULT && resultCode == Activity.RESULT_OK) {
             Uri selectedImage = data.getData();
-
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-
-            Cursor cursor = getActivity().getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-
-            Bitmap bm = BitmapFactory.decodeFile(picturePath);
-            showTags(bm);
+            showTags(selectedImage);
         }
     }
 
-    public void showTags(Bitmap bm) {
+    public void showTags(Uri uri) {
+        currentMediaPath = uri;
+        String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+        Cursor cursor = getActivity().getContentResolver().query(uri,
+                filePathColumn, null, null, null);
+        cursor.moveToFirst();
+
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        String picturePath = cursor.getString(columnIndex);
+        cursor.close();
+
+        Bitmap bm = BitmapFactory.decodeFile(picturePath);
+        ExifInterface exif = null;
+
+        try {
+            exif = new ExifInterface(picturePath);
+        } catch (IOException e) { }
+
+        displayImageAndTags(bm, exif);
+    }
+
+    private void displayImageAndTags(Bitmap bm, ExifInterface exif) {
+        int orientation = ExifInterface.ORIENTATION_NORMAL;
+
+        if (exif != null)
+            orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                bm = Utils.rotateBitmap(bm, 90);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                bm = Utils.rotateBitmap(bm, 180);
+                break;
+
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                bm = Utils.rotateBitmap(bm, 270);
+                break;
+        }
+
         ImageView imageView = getView().findViewById(R.id.keywhat_image_view);
         imageView.setImageDrawable(null);
         imageView.setImageTintList(null);
@@ -115,21 +150,12 @@ public class Keywhat extends Fragment implements ChipListener {
         cloud = getView().findViewById(R.id.keywhat_tag_cloud);
         cloud.setChipListener(this);
 
-        try {
-            if(getArguments() != null)
-            {
-                Uri imageUri = getArguments().getParcelable("queuedImage");
-                InputStream is = getActivity().getContentResolver().openInputStream(imageUri);
-                Bitmap bm = BitmapFactory.decodeStream(is);
-
-                if(bm != null)
-                    showTags(bm);
-            }
-
-        } catch (IOException ex)
+        if(getArguments() != null)
         {
-            Log.e(getTag(), ex.getMessage());
+            Uri imageUri = getArguments().getParcelable("queuedImage");
+            showTags(imageUri);
         }
+
 
     }
 
@@ -164,14 +190,28 @@ public class Keywhat extends Fragment implements ChipListener {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.keywhat_action_copy) {
+            handleCopy(false);
+        } else if(id == R.id.keywhat_action_share) {
+            handleShare();
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void chipSelected(int i) {
-        selectedTags.add(new Integer(i));
+        selectedTags.add(this.tags.get(i));
         toggleMenuItems(selectedTags.size() > 0);
     }
 
     @Override
     public void chipDeselected(int i) {
-        selectedTags.remove(new Integer(i));
+        selectedTags.remove(this.tags.get(i));
         toggleMenuItems(selectedTags.size() > 0);
     }
 
@@ -188,6 +228,9 @@ public class Keywhat extends Fragment implements ChipListener {
             if(item != null)
                 item.setVisible(visible);
         }
+
+        getView().findViewById(R.id.keywhat_cb_hashtag)
+                .setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
     }
 
 
@@ -299,18 +342,49 @@ public class Keywhat extends Fragment implements ChipListener {
 
     private void updateTagCloud() {
         CheckBox cb = getView().findViewById(R.id.keywhat_cb_hashtag);
-        String[] tags = this.tags.toArray(new String[0]);
-
         cloud.removeAllViews();
-        for(int i = 0; i < tags.length; i++) {
+
+        for(int i = 0; i < this.tags.size(); i++) {
             String prefix = cb.isChecked() ? "#" : "";
-            tags[i] = prefix + tags[i];
-            cloud.addChip(tags[i]);
+            String tag = prefix + this.tags.get(i);
+            cloud.addChip(tag);
 
-            if(selectedTags.contains(new Integer(i)))
+            if(selectedTags.contains(this.tags.get(i)))
                 cloud.setSelectedChip(i);
-
         }
+    }
+
+    private String handleCopy(boolean suppressToast) {
+        if(selectedTags.size() == 0)
+            return "";
+
+        String prefix = ((CheckBox)getView().findViewById(R.id.keywhat_cb_hashtag))
+                .isChecked() ? "#" : "";
+
+        String output = "";
+        for(String tag : selectedTags) {
+            output += prefix + tag + " ";
+        }
+
+        output += prefix + "photils";
+
+        ClipData data = ClipData.newPlainText("photils tags", output);
+        ((ClipboardManager)getActivity().getSystemService(Context.CLIPBOARD_SERVICE))
+                .setPrimaryClip(data);
+
+
+        if(!suppressToast) {
+            Toast.makeText(getActivity(), getActivity()
+                    .getString(R.string.keywhat_copy_success), Toast.LENGTH_LONG).show();
+        }
+
+        return output;
+
+    }
+
+    private void handleShare() {
+        String content = handleCopy(true);
+        Utils.shareImageIntent(getContext(), currentMediaPath, content);
     }
 
 

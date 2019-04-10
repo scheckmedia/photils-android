@@ -1,6 +1,10 @@
 package app.photils;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.net.Uri;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -25,4 +29,20 @@ public class Utils {
         }
         return byteBuffer;
     }
+
+    public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees);
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+    }
+
+    public static void shareImageIntent(Context ctx, Uri uri, String conent){
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("image/*");
+        share.putExtra(Intent.EXTRA_TEXT,conent);
+        share.putExtra(Intent.EXTRA_STREAM, uri);
+
+        ctx.startActivity(Intent.createChooser(share, "Share to"));
+    }
 }
+

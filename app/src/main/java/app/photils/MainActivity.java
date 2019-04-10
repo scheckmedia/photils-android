@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -42,12 +43,10 @@ public class MainActivity extends AppCompatActivity
         changeFragment(R.id.nav_keywhat);
 
         Intent intent = getIntent();
-        String type = intent.getType();
 
-        if(Intent.ACTION_SEND.equals(intent.getAction()) && type != null) {
-            if(type.startsWith("image/")) {
-                handleReceivedImage(intent);
-            }
+        String uri = intent.getStringExtra("shared_image");
+        if(uri != null) {
+            handleReceivedImage(Uri.parse(uri));
         }
     }
 
@@ -64,11 +63,6 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.keywhat_action_share) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -118,8 +112,7 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void handleReceivedImage(Intent intent) {
-        Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+    private void handleReceivedImage(Uri imageUri) {
         if (imageUri != null) {
             changeFragment(R.id.nav_keywhat);
 
