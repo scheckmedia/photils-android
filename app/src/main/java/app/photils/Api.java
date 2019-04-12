@@ -1,13 +1,8 @@
 package app.photils;
 
-import android.arch.core.util.Function;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.provider.CalendarContract;
 import android.util.Base64;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -38,15 +33,17 @@ public class Api {
     private RequestQueue requestQueue;
     private Context ctx;
 
-    private Api(Context ctx) throws IOException {
+    private Api(Context ctx) {
         this.ctx = ctx;
         requestQueue = Volley.newRequestQueue(ctx);
         requestQueue.start();
 
-        tflite = new Interpreter(loadModel());
+        try {
+            tflite = new Interpreter(loadModel());
+        } catch (Exception ex) {}
     }
 
-    public static synchronized Api getInstance(Context ctx) throws IOException {
+    public static synchronized Api getInstance(Context ctx) {
         if(Api.instance == null)
             Api.instance = new Api(ctx);
 
@@ -54,6 +51,11 @@ public class Api {
     }
 
     public void getTags(ByteBuffer img, OnTagsReceived callback) {
+        if(tflite == null) {
+            callback.onFail(new ApiException(ctx.getString(R.string.api_tflite_error)));
+            return;
+        }
+
 
         float[][] result = new float[1][256];
         tflite.run(img ,result);
@@ -101,6 +103,10 @@ public class Api {
 
 
     public static class ApiException extends RuntimeException {
+        public ApiException(String message) {
+            super(message);
+        }
+
         public ApiException(String message, Throwable cause) {
             super(message, cause);
         }

@@ -24,6 +24,7 @@
         android:layout_gravity="start"
         android:background="@color/photilsDarkBackground"
         android:fitsSystemWindows="true"
+        android:visibility="gone"
         app:headerLayout="@layout/nav_header_main"
         app:itemIconTint="@color/photilsText"
         app:itemTextColor="@color/photilsText"

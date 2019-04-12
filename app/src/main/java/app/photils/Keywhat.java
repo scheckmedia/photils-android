@@ -2,6 +2,7 @@ package app.photils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -20,7 +21,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,7 +36,7 @@ import com.adroitandroid.chipcloud.ChipCloud;
 import com.adroitandroid.chipcloud.ChipListener;
 
 import java.io.IOException;
-import java.io.InputStream;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -250,6 +250,7 @@ public class Keywhat extends Fragment implements ChipListener {
         void onFragmentInteraction(Uri uri);
     }
 
+    // TODO: remove from here and put it else
     private void checkPermission(){
         boolean canRead = ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
@@ -301,13 +302,7 @@ public class Keywhat extends Fragment implements ChipListener {
 
 
     private void requestTags(Bitmap bm) {
-
-        ProgressBar pb = getView().findViewById(R.id.keywhat_progress);
-        ViewGroup.LayoutParams params = pb.getLayoutParams();
-        params.height = 20;
-        pb.setLayoutParams(params);
-        pb.setVisibility(View.VISIBLE);
-
+        toggleProgress(true);
 
         Api.OnTagsReceived callback = new Api.OnTagsReceived() {
             @Override
@@ -317,27 +312,42 @@ public class Keywhat extends Fragment implements ChipListener {
                 selectedTags.clear();
 
                 updateTagCloud();
-                pb.setVisibility(View.INVISIBLE);
-
-                params.height = 0;
-                pb.setLayoutParams(params);
+                toggleProgress(false);
             }
 
             @Override
             public void onFail(Api.ApiException ex) {
+                toggleProgress(false);
 
+                new AlertDialog.Builder(getContext())
+                        .setTitle(getString(R.string.keywhat_error_title))
+                        .setMessage(getString(R.string.keywhat_error_message, ex.getMessage()))
+                        .setPositiveButton(R.string.keywhat_error_btn_ok, null)
+                        .show();
             }
         };
 
         new Thread(() -> {
             ByteBuffer img = Utils.convertBitmapToByteBuffer(bm, inputSize);
-            try {
-                Api.getInstance(getActivity().getApplicationContext()).getTags(img, callback);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Api.getInstance(getActivity().getApplicationContext()).getTags(img, callback);
         }).start();
 
+    }
+
+    private void toggleProgress(boolean visible) {
+        ProgressBar pb = getView().findViewById(R.id.keywhat_progress);
+        ViewGroup.LayoutParams params = pb.getLayoutParams();
+
+        if(visible) {
+            params.height = 20;
+            pb.setLayoutParams(params);
+            pb.setVisibility(View.VISIBLE);
+
+        } else {
+            pb.setVisibility(View.INVISIBLE);
+            params.height = 0;
+            pb.setLayoutParams(params);
+        }
     }
 
     private void updateTagCloud() {

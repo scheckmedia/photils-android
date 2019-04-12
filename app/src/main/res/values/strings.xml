@@ -12,4 +12,11 @@
     <string name="keywhat_share">Get Hashtags</string>
     <string name="keywhat_copy_success">The hashtags has been copied to clipboard.</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
+
+
+    <string name="api_tflite_error">Could not load the required library to execute the tag suggestion algorithm.</string>
+
+    <string name="keywhat_error_title">Error</string>
+    <string name="keywhat_error_message">An error occurred while executing the algorithm.\n\n%s</string>
+    <string name="keywhat_error_btn_ok">That\'s a pity</string>
 </resources>

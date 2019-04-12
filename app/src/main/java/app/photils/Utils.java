@@ -5,7 +5,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.AsyncTask;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -45,4 +49,23 @@ public class Utils {
         ctx.startActivity(Intent.createChooser(share, "Share to"));
     }
 }
+
+// https://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-times-out?answertab=votes#tab-top
+class InternetCheck extends AsyncTask<Void,Void,Boolean> {
+
+    private Consumer mConsumer;
+    public interface Consumer { void accept(Boolean internet); }
+
+    public  InternetCheck(Consumer consumer) { mConsumer = consumer; execute(); }
+
+    @Override protected Boolean doInBackground(Void... voids) { try {
+        Socket sock = new Socket();
+        sock.connect(new InetSocketAddress("8.8.8.8", 53), 1500);
+        sock.close();
+        return true;
+    } catch (IOException e) { return false; } }
+
+    @Override protected void onPostExecute(Boolean internet) { mConsumer.accept(internet); }
+}
+
 

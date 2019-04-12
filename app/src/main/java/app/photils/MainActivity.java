@@ -1,22 +1,17 @@
 package app.photils;
 
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener, Keywhat.OnFragmentInteractionListener {
@@ -44,9 +39,9 @@ public class MainActivity extends AppCompatActivity
 
         Intent intent = getIntent();
 
-        String uri = intent.getStringExtra("shared_image");
+        Uri uri = intent.getData();
         if(uri != null) {
-            handleReceivedImage(Uri.parse(uri));
+            handleReceivedImage(uri);
         }
     }
 

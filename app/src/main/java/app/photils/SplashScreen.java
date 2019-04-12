@@ -19,7 +19,8 @@ public class SplashScreen extends Activity {
         if(Intent.ACTION_SEND.equals(getIntent().getAction()) && type != null) {
             Uri imageUri = getIntent().getParcelableExtra(Intent.EXTRA_STREAM);
             if(type.startsWith("image/") && imageUri != null) {
-                intent.putExtra("shared_image", imageUri.toString());
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.setData(imageUri);
             }
         }
 
