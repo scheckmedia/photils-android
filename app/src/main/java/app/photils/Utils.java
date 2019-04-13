@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
 
@@ -47,6 +48,15 @@ public class Utils {
         share.putExtra(Intent.EXTRA_STREAM, uri);
 
         ctx.startActivity(Intent.createChooser(share, "Share to"));
+    }
+
+    // https://stackoverflow.com/questions/15440647/scaled-bitmap-maintaining-aspect-ratio
+    public static Bitmap scaleBitmapAndKeepRation(Bitmap targetBmp,int reqHeightInPixels,int reqWidthInPixels)
+    {
+        Matrix matrix = new Matrix();
+        matrix .setRectToRect(new RectF(0, 0, targetBmp.getWidth(), targetBmp.getHeight()), new RectF(0, 0, reqWidthInPixels, reqHeightInPixels), Matrix.ScaleToFit.CENTER);
+        Bitmap scaledBitmap = Bitmap.createBitmap(targetBmp, 0, 0, targetBmp.getWidth(), targetBmp.getHeight(), matrix, true);
+        return scaledBitmap;
     }
 }
 

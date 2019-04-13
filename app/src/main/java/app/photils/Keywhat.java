@@ -37,6 +37,7 @@ import com.adroitandroid.chipcloud.ChipListener;
 
 import java.io.IOException;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -46,40 +47,50 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link Keywhat.OnFragmentInteractionListener} interface
+ * {@link Keywhat.OnKeywhatListener} interface
  * to handle interaction events.
  * Use the {@link Keywhat#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class Keywhat extends Fragment implements ChipListener {
-
-    // TODO: Rename and change types of parameters
+// TODO: Rename and change types of parameters
 
     private int IMAGE_SELECTION_RESULT = 1;
     static final int PERMISSION_READ_CODE = 1;
     static final int PERMISSION_INTERNET_CODE = 2;
     static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
 
-
     final static int inputSize = 256;
-    final ArrayList<String> tags = new ArrayList<>();
-
-    private HashSet<String> selectedTags = new HashSet<>();
+    private ProgressBar progressBar;
     private ChipCloud cloud;
-    private Uri currentMediaPath = null;
+    private KeywhatState state = new KeywhatState();
+    private ImageView imageView;
+    private CheckBox cbAlias;
+    private Api api;
 
-    public Keywhat() {
-        // Required empty public constructor
-    }
+    private OnKeywhatListener listener;
+
+    public Keywhat() { }
 
 
     public static Keywhat newInstance(Uri imageUri) {
         Keywhat f = new Keywhat();
-
         Bundle args = new Bundle();
         args.putParcelable("queuedImage", imageUri);
         f.setArguments(args);
         return f;
+    }
+
+    public static Keywhat newInstance(KeywhatState state) {
+        Keywhat f = new Keywhat();
+        Bundle args = new Bundle();
+        args.putParcelable("state", state);
+        f.setArguments(args);
+        return f;
+    }
+
+    public KeywhatState getState() {
+        return state;
     }
 
 
@@ -89,12 +100,17 @@ public class Keywhat extends Fragment implements ChipListener {
 
         if(requestCode == IMAGE_SELECTION_RESULT && resultCode == Activity.RESULT_OK) {
             Uri selectedImage = data.getData();
-            showTags(selectedImage);
+            showTags(selectedImage, false);
         }
     }
 
-    public void showTags(Uri uri) {
-        currentMediaPath = uri;
+    public void showTags(Uri uri, boolean cached) {
+        if(!cached)
+            state.setActiveUri(uri);
+
+        if(uri == null)
+            return;
+
         String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
         Cursor cursor = getActivity().getContentResolver().query(uri,
@@ -113,6 +129,18 @@ public class Keywhat extends Fragment implements ChipListener {
         } catch (IOException e) { }
 
         displayImageAndTags(bm, exif);
+
+        if(!cached)
+            requestTags(bm);
+    }
+
+    private void restoreFromState(KeywhatState state) {
+        this.state = state;
+        cbAlias.setChecked(state.isAliasEnabled());
+
+        showTags(this.state.getActiveUri(), true);
+        updateTagCloud();
+        toggleMenuItems();
     }
 
     private void displayImageAndTags(Bitmap bm, ExifInterface exif) {
@@ -134,60 +162,70 @@ public class Keywhat extends Fragment implements ChipListener {
                 break;
         }
 
-        ImageView imageView = getView().findViewById(R.id.keywhat_image_view);
+        bm = Utils.scaleBitmapAndKeepRation(bm, 512, 512);
+
         imageView.setImageDrawable(null);
         imageView.setImageTintList(null);
 
         imageView.setImageBitmap(bm);
-
-        requestTags(bm);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        cloud = getView().findViewById(R.id.keywhat_tag_cloud);
-        cloud.setChipListener(this);
-
+        api = Api.getInstance(getActivity().getApplicationContext());
         if(getArguments() != null)
         {
             Uri imageUri = getArguments().getParcelable("queuedImage");
-            showTags(imageUri);
+            KeywhatState s = getArguments().getParcelable("state");
+            if (imageUri   != null) {
+                showTags(imageUri, false);
+            } else if(s !=  null) {
+                restoreFromState(s);
+            }
+
         }
-
-
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.keyhwat_actions, menu);
+
+        int size = menu.size();
+        for(int i = 0; i < size; i++)
+            menu.getItem(i).setVisible(this.state.getSelectedTags().size() > 0);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         View  v = inflater.inflate(R.layout.fragment_keywhat, container, false);
-        ImageView iv = v.findViewById(R.id.keywhat_image_view);
-        CheckBox cb = v.findViewById(R.id.keywhat_cb_hashtag);
+        progressBar = v.findViewById(R.id.keywhat_progress);
+        imageView = v.findViewById(R.id.keywhat_image_view);
+        cbAlias = v.findViewById(R.id.keywhat_cb_hashtag);
+        cloud = v.findViewById(R.id.keywhat_tag_cloud);
+        cloud.setChipListener(this);
 
         checkPermission();
 
-        iv.setOnClickListener(v1 -> {
+        imageView.setOnClickListener(v1 -> {
             Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(i, IMAGE_SELECTION_RESULT);
         });
 
-        cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        cbAlias.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            this.state.setAliasEnabled(isChecked);
             updateTagCloud();
         });
 
         return v;
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -205,34 +243,23 @@ public class Keywhat extends Fragment implements ChipListener {
 
     @Override
     public void chipSelected(int i) {
-        selectedTags.add(this.tags.get(i));
-        toggleMenuItems(selectedTags.size() > 0);
+        this.state.getSelectedTags().add(this.state.getTags().get(i));
+        toggleMenuItems();
     }
 
     @Override
     public void chipDeselected(int i) {
-        selectedTags.remove(this.tags.get(i));
-        toggleMenuItems(selectedTags.size() > 0);
+        this.state.getSelectedTags().remove(this.state.getTags().get(i));
+        toggleMenuItems();
     }
 
-    void toggleMenuItems(boolean visible) {
-        int[] menuItems = new int[] {
-          R.id.keywhat_action_share,
-          R.id.keywhat_action_copy
-        };
+    void toggleMenuItems() {
+        int size = this.state.getSelectedTags().size();
+        cbAlias.setVisibility(size > 0 ? View.VISIBLE : View.INVISIBLE);
 
-        Toolbar toolbar = ((MainActivity)getActivity()).getToolbar();
-
-        for(int i = 0; i < menuItems.length; i++) {
-            MenuItem item = toolbar.getMenu().getItem(i);
-            if(item != null)
-                item.setVisible(visible);
-        }
-
-        getView().findViewById(R.id.keywhat_cb_hashtag)
-                .setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
+        if(listener != null)
+            listener.onTagSelectedSize(size);
     }
-
 
 
     /**
@@ -245,9 +272,13 @@ public class Keywhat extends Fragment implements ChipListener {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnKeywhatListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onTagSelectedSize(int size);
+    }
+
+    public void setListener(OnKeywhatListener listener) {
+        this.listener = listener;
     }
 
     // TODO: remove from here and put it else
@@ -307,9 +338,9 @@ public class Keywhat extends Fragment implements ChipListener {
         Api.OnTagsReceived callback = new Api.OnTagsReceived() {
             @Override
             public void onSuccess(List<String> tagList) {
-                tags.clear();
-                tags.addAll(tagList);
-                selectedTags.clear();
+                state.getTags().clear();
+                state.getTags().addAll(tagList);
+                state.getSelectedTags().clear();
 
                 updateTagCloud();
                 toggleProgress(false);
@@ -329,50 +360,51 @@ public class Keywhat extends Fragment implements ChipListener {
 
         new Thread(() -> {
             ByteBuffer img = Utils.convertBitmapToByteBuffer(bm, inputSize);
-            Api.getInstance(getActivity().getApplicationContext()).getTags(img, callback);
+            api.getTags(img, callback);
         }).start();
 
     }
 
     private void toggleProgress(boolean visible) {
-        ProgressBar pb = getView().findViewById(R.id.keywhat_progress);
-        ViewGroup.LayoutParams params = pb.getLayoutParams();
+        ViewGroup.LayoutParams params = progressBar.getLayoutParams();
 
         if(visible) {
             params.height = 20;
-            pb.setLayoutParams(params);
-            pb.setVisibility(View.VISIBLE);
+            progressBar.setLayoutParams(params);
+            progressBar.setVisibility(View.VISIBLE);
 
         } else {
-            pb.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
             params.height = 0;
-            pb.setLayoutParams(params);
+            progressBar.setLayoutParams(params);
         }
     }
 
     private void updateTagCloud() {
-        CheckBox cb = getView().findViewById(R.id.keywhat_cb_hashtag);
         cloud.removeAllViews();
 
-        for(int i = 0; i < this.tags.size(); i++) {
-            String prefix = cb.isChecked() ? "#" : "";
-            String tag = prefix + this.tags.get(i);
+        for(int i = 0; i < this.state.getTags().size(); i++) {
+            String prefix = cbAlias.isChecked() ? "#" : "";
+            String tag = prefix + this.state.getTags().get(i);
             cloud.addChip(tag);
 
-            if(selectedTags.contains(this.tags.get(i)))
+            if(this.state.getSelectedTags().contains(this.state.getTags().get(i)))
                 cloud.setSelectedChip(i);
+        }
+
+        if(this.listener != null) {
+            listener.onTagSelectedSize(this.state.getSelectedTags().size());
         }
     }
 
     private String handleCopy(boolean suppressToast) {
-        if(selectedTags.size() == 0)
+        if(this.state.getSelectedTags().size() == 0)
             return "";
 
-        String prefix = ((CheckBox)getView().findViewById(R.id.keywhat_cb_hashtag))
-                .isChecked() ? "#" : "";
+        String prefix = cbAlias.isChecked() ? "#" : "";
 
         String output = "";
-        for(String tag : selectedTags) {
+        for(String tag : this.state.getSelectedTags()) {
             output += prefix + tag + " ";
         }
 
@@ -394,8 +426,7 @@ public class Keywhat extends Fragment implements ChipListener {
 
     private void handleShare() {
         String content = handleCopy(true);
-        Utils.shareImageIntent(getContext(), currentMediaPath, content);
+        Utils.shareImageIntent(getContext(), this.state.getActiveUri(), content);
     }
-
-
 }
+

@@ -14,9 +14,10 @@ import android.view.MenuItem;
 
 
 public class MainActivity extends AppCompatActivity
-        implements BottomNavigationView.OnNavigationItemSelectedListener, Keywhat.OnFragmentInteractionListener {
+        implements BottomNavigationView.OnNavigationItemSelectedListener, Keywhat.OnKeywhatListener {
 
     private Toolbar toolbar;
+    private int current_menu = R.id.nav_keywhat;
 
     public Toolbar getToolbar() {
         return toolbar;
@@ -35,13 +36,49 @@ public class MainActivity extends AppCompatActivity
         bottomBar.setOnNavigationItemSelectedListener(this);
         bottomBar.getMenu().getItem(0).setChecked(true);
 
-        changeFragment(R.id.nav_keywhat);
+        Fragment f = null;
+        String title = "";
 
         Intent intent = getIntent();
-
         Uri uri = intent.getData();
-        if(uri != null) {
-            handleReceivedImage(uri);
+
+        if (current_menu == R.id.nav_keywhat) {
+            if(uri != null) {
+                f = Keywhat.newInstance(uri);
+                intent.setData(null);
+            } else if(savedInstanceState != null) {
+                KeywhatState state = savedInstanceState.getParcelable("fragmentState");
+                f = Keywhat.newInstance(state);
+            }
+
+            title = getResources().getString(R.string.menu_keywhat);
+
+            if(f != null) {
+                //f.setRetainInstance(true);
+                FragmentTransaction  ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, f, "KEYWHAT");
+                ft.commit();
+
+                getSupportActionBar().setTitle(title);
+
+            } else {
+                changeFragment(R.id.nav_keywhat);
+            }
+        }
+
+
+
+
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Keywhat fragment = (Keywhat) getSupportFragmentManager().findFragmentByTag("KEYWHAT");
+        if(fragment != null && fragment.isVisible()) {
+            outState.putParcelable("fragmentState", fragment.getState());
         }
     }
 
@@ -69,9 +106,17 @@ public class MainActivity extends AppCompatActivity
         return changeFragment(item.getItemId());
     }
 
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        if(fragment instanceof Keywhat) {
+            ((Keywhat) fragment).setListener(this);
+        }
+    }
+
     private boolean changeFragment(int id) {
         Fragment fragment = null;
         String title = "";
+        current_menu = id;
 
         if (id == R.id.nav_keywhat) {
             // Handle the camera action
@@ -86,20 +131,15 @@ public class MainActivity extends AppCompatActivity
         if(fragment != null)
         {
             FragmentTransaction  ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, fragment);
+            ft.replace(R.id.content_frame, fragment, "KEYWHAT");
             ft.commit();
 
             title = getResources().getString(R.string.menu_keywhat);
-
         }
 
+        //fragment.setRetainInstance(true);
         getSupportActionBar().setTitle(title);
         return true;
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 
     @Override
@@ -107,21 +147,11 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void handleReceivedImage(Uri imageUri) {
-        if (imageUri != null) {
-            changeFragment(R.id.nav_keywhat);
-
-            Keywhat fragment = Keywhat.newInstance(imageUri);
-
-            if(fragment != null)
-            {
-                FragmentTransaction  ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, fragment);
-                ft.commit();
-
-                String title = getResources().getString(R.string.menu_keywhat);
-                getSupportActionBar().setTitle(title);
-            }
+    @Override
+    public void onTagSelectedSize(int size) {
+        int numItems = toolbar.getMenu().size();
+        for(int i = 0; i < numItems; i++) {
+            getToolbar().getMenu().getItem(i).setVisible( size > 0);
         }
     }
 }
