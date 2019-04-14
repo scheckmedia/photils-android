@@ -275,6 +275,8 @@ public class Keywhat extends Fragment implements ChipListener {
     public interface OnKeywhatListener {
         // TODO: Update argument type and name
         void onTagSelectedSize(int size);
+        void onRequestTags();
+        void onTagsAvailable();
     }
 
     public void setListener(OnKeywhatListener listener) {
@@ -333,8 +335,10 @@ public class Keywhat extends Fragment implements ChipListener {
 
 
     private void requestTags(Bitmap bm) {
-        toggleProgress(true);
+        if(this.listener != null)
+            this.listener.onRequestTags();
 
+        toggleProgress(true);
         Api.OnTagsReceived callback = new Api.OnTagsReceived() {
             @Override
             public void onSuccess(List<String> tagList) {
@@ -344,6 +348,9 @@ public class Keywhat extends Fragment implements ChipListener {
 
                 updateTagCloud();
                 toggleProgress(false);
+
+                if(listener != null)
+                    listener.onTagsAvailable();
             }
 
             @Override
