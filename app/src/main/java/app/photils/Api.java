@@ -25,40 +25,40 @@ import java.util.List;
 
 public class Api {
 
-    protected Interpreter tflite;
+    protected Interpreter mInterpreter;
 
     final static String URL = "https://api.photils.app/";
 
-    private static Api instance;
-    private RequestQueue requestQueue;
-    private Context ctx;
+    private static Api mInstance;
+    private RequestQueue mRequestQueue;
+    private Context mContext;
 
     private Api(Context ctx) {
-        this.ctx = ctx;
-        requestQueue = Volley.newRequestQueue(ctx);
-        requestQueue.start();
+        this.mContext = ctx;
+        mRequestQueue = Volley.newRequestQueue(ctx);
+        mRequestQueue.start();
 
         try {
-            tflite = new Interpreter(loadModel());
+            mInterpreter = new Interpreter(loadModel());
         } catch (Exception ex) {}
     }
 
     public static synchronized Api getInstance(Context ctx) {
-        if(Api.instance == null)
-            Api.instance = new Api(ctx);
+        if(Api.mInstance == null)
+            Api.mInstance = new Api(ctx);
 
-        return Api.instance;
+        return Api.mInstance;
     }
 
     public void getTags(ByteBuffer img, OnTagsReceived callback) {
-        if(tflite == null) {
-            callback.onFail(new ApiException(ctx.getString(R.string.api_tflite_error)));
+        if(mInterpreter == null) {
+            callback.onFail(new ApiException(mContext.getString(R.string.api_tflite_error)));
             return;
         }
 
 
         float[][] result = new float[1][256];
-        tflite.run(img ,result);
+        mInterpreter.run(img ,result);
 
         ByteBuffer buffer = ByteBuffer.allocate(4 * 256);
         buffer.order(ByteOrder.nativeOrder());
@@ -98,7 +98,7 @@ public class Api {
             callback.onFail(new ApiException(error.getMessage(), error.getCause()));
         });
 
-        requestQueue.add(req);
+        mRequestQueue.add(req);
     }
 
 
@@ -113,9 +113,9 @@ public class Api {
     }
 
     private MappedByteBuffer loadModel() throws IOException {
-        //AssetManager mgr = ctx.getApplicationContext().getAssets();
+        //AssetManager mgr = mContext.getApplicationContext().getAssets();
         //AssetFileDescriptor fd = mgr.openFd(MODEL_PATH);
-        AssetFileDescriptor fd = ctx.getResources().openRawResourceFd(R.raw.model);
+        AssetFileDescriptor fd = mContext.getResources().openRawResourceFd(R.raw.model);
         FileInputStream fis = new FileInputStream(fd.getFileDescriptor());
         FileChannel channel = fis.getChannel();
 

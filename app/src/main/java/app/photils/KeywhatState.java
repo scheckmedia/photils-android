@@ -1,6 +1,5 @@
 package app.photils;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -10,53 +9,53 @@ import java.util.HashSet;
 import java.util.List;
 
 public class KeywhatState implements Parcelable {
-    private ArrayList<String> tags = new ArrayList<>();
-    private HashSet<String> selectedTags = new HashSet<>();
-    private Uri activeUri;
-    private boolean aliasEnabled = false;
+    private ArrayList<String> mTags = new ArrayList<>();
+    private HashSet<String> mSelectedTags = new HashSet<>();
+    private Uri mActiveUri;
+    private boolean mAliasEnabled = false;
 
     public KeywhatState() { }
 
-    public ArrayList<String> getTags() {
-        return tags;
+    public ArrayList<String> getmTags() {
+        return mTags;
     }
 
 
     public HashSet<String> getSelectedTags() {
-        return selectedTags;
+        return mSelectedTags;
     }
 
 
     public Uri getActiveUri() {
-        return activeUri;
+        return mActiveUri;
     }
 
-    public void setActiveUri(Uri activeUri) {
-        this.activeUri = activeUri;
+    public void setActiveUri(Uri mActiveUri) {
+        this.mActiveUri = mActiveUri;
     }
 
     public boolean isAliasEnabled() {
-        return aliasEnabled;
+        return mAliasEnabled;
     }
 
-    public void setAliasEnabled(boolean aliasEnabled) {
-        this.aliasEnabled = aliasEnabled;
+    public void setAliasEnabled(boolean mAliasEnabled) {
+        this.mAliasEnabled = mAliasEnabled;
     }
 
     protected KeywhatState(Parcel in) {
-        tags = in.createStringArrayList();
-        aliasEnabled = in.readByte() != 0;
+        mTags = in.createStringArrayList();
+        mAliasEnabled = in.readByte() != 0;
 
         List<String> tmp = new ArrayList<>();
         in.readStringList(tmp);
         for(String v : tmp)
-            selectedTags.add(v);
+            mSelectedTags.add(v);
 
-        activeUri = in.readParcelable(Uri.class.getClassLoader());
+        mActiveUri = in.readParcelable(Uri.class.getClassLoader());
     }
 
     public void addSelectedTag(String tag) {
-        this.selectedTags.add(tag);
+        this.mSelectedTags.add(tag);
     }
 
     public static final Parcelable.Creator<KeywhatState> CREATOR =
@@ -80,11 +79,11 @@ public class KeywhatState implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringList(tags);
-        dest.writeByte((byte)(aliasEnabled ? 1 : 0) );
-        dest.writeList(new ArrayList(selectedTags));
+        dest.writeStringList(mTags);
+        dest.writeByte((byte)(mAliasEnabled ? 1 : 0) );
+        dest.writeList(new ArrayList(mSelectedTags));
 
-        if(activeUri != null)
-            activeUri.writeToParcel(dest, 0);
+        if(mActiveUri != null)
+            mActiveUri.writeToParcel(dest, 0);
     }
 }
