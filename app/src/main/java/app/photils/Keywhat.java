@@ -13,13 +13,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,8 +39,13 @@ import android.widget.Toast;
 import com.adroitandroid.chipcloud.ChipCloud;
 import com.adroitandroid.chipcloud.ChipListener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -117,21 +126,52 @@ public class Keywhat extends Fragment implements ChipListener {
                 filePathColumn, null, null, null);
         cursor.moveToFirst();
 
-        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-        String picturePath = cursor.getString(columnIndex);
+        String picturePath = null;
+
+        if (cursor.getColumnCount() > 0) {
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            picturePath = cursor.getString(columnIndex);
+        }
+
         cursor.close();
 
-        Bitmap bm = BitmapFactory.decodeFile(picturePath);
-        ExifInterface exif = null;
 
+
+        ExifInterface exif = null;
+        Bitmap bm = null;
         try {
+            if(picturePath == null)
+                picturePath = getUriFromTemporary(uri);
+
+            bm = BitmapFactory.decodeFile(picturePath);
             exif = new ExifInterface(picturePath);
         } catch (IOException e) { }
 
-        displayImageAndTags(bm, exif);
+        if(bm != null) {
+            displayImageAndTags(bm, exif);
+            if(!cached)
+                requestTags(bm);
+        }
+    }
 
-        if(!cached)
-            requestTags(bm);
+    private String getUriFromTemporary(Uri uri) throws IOException {
+        File imageCache = new File(getActivity().getCacheDir() + "/image/");
+
+        if(!imageCache.exists())
+            imageCache.mkdir();
+
+        InputStream is = getActivity().getContentResolver().openInputStream(uri);
+        Bitmap bm = BitmapFactory.decodeStream(is);
+        File tmp = new File(imageCache, "cached.jpg");
+        FileOutputStream fos = new FileOutputStream(tmp);
+        bm.compress(Bitmap.CompressFormat.JPEG, 80, fos);
+        fos.flush();
+        fos.close();
+
+        Uri tmpUri = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".provider", tmp);
+        getContext().grantUriPermission(BuildConfig.APPLICATION_ID, tmpUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        state.setActiveUri(tmpUri);
+        return tmp.toString();
     }
 
     private void restoreFromState(KeywhatState state) {

@@ -12,15 +12,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+
 
 public class MainActivity extends AppCompatActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener, Keywhat.OnKeywhatListener {
 
-    private Toolbar toolbar;
-    private int current_menu = R.id.nav_keywhat;
+    private Toolbar mToolbar;
+    private InterstitialAd mInterstitialAd;
+    private int mCurrentMenu = R.id.nav_keywhat;
 
-    public Toolbar getToolbar() {
-        return toolbar;
+    public Toolbar getmToolbar() {
+        return mToolbar;
     }
 
     @Override
@@ -28,8 +33,17 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-4565424718929305/3632119213");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            }
+        });
+        mToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
 
         BottomNavigationView bottomBar =findViewById(R.id.bottm_navigation);
@@ -42,7 +56,7 @@ public class MainActivity extends AppCompatActivity
         Intent intent = getIntent();
         Uri uri = intent.getData();
 
-        if (current_menu == R.id.nav_keywhat) {
+        if (mCurrentMenu == R.id.nav_keywhat) {
             if(uri != null) {
                 f = Keywhat.newInstance(uri);
                 intent.setData(null);
@@ -116,7 +130,7 @@ public class MainActivity extends AppCompatActivity
     private boolean changeFragment(int id) {
         Fragment fragment = null;
         String title = "";
-        current_menu = id;
+        mCurrentMenu = id;
 
         if (id == R.id.nav_keywhat) {
             // Handle the camera action
@@ -149,9 +163,18 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onTagSelectedSize(int size) {
-        int numItems = toolbar.getMenu().size();
+        int numItems = mToolbar.getMenu().size();
         for(int i = 0; i < numItems; i++) {
-            getToolbar().getMenu().getItem(i).setVisible( size > 0);
+            getmToolbar().getMenu().getItem(i).setVisible( size > 0);
         }
+    }
+
+    @Override
+    public void onRequestTags() { }
+
+    @Override
+    public void onTagsAvailable() {
+        if(mInterstitialAd.isLoaded())
+            mInterstitialAd.show();
     }
 }

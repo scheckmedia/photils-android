@@ -46,20 +46,21 @@ public class KeywhatState implements Parcelable {
     protected KeywhatState(Parcel in) {
         tags = in.createStringArrayList();
         aliasEnabled = in.readByte() != 0;
-        activeUri = in.readParcelable(Uri.class.getClassLoader());
 
         List<String> tmp = new ArrayList<>();
         in.readStringList(tmp);
         for(String v : tmp)
             selectedTags.add(v);
 
+        activeUri = in.readParcelable(Uri.class.getClassLoader());
     }
 
     public void addSelectedTag(String tag) {
         this.selectedTags.add(tag);
     }
 
-    public static final Creator<KeywhatState> CREATOR = new Creator<KeywhatState>() {
+    public static final Parcelable.Creator<KeywhatState> CREATOR =
+            new Parcelable.Creator<KeywhatState>() {
         @Override
         public KeywhatState createFromParcel(Parcel in) {
             return new KeywhatState(in);
@@ -84,6 +85,6 @@ public class KeywhatState implements Parcelable {
         dest.writeList(new ArrayList(selectedTags));
 
         if(activeUri != null)
-            activeUri.writeToParcel(dest, PARCELABLE_WRITE_RETURN_VALUE);
+            activeUri.writeToParcel(dest, 0);
     }
 }
