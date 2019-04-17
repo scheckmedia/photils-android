@@ -17,10 +17,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="PhotilsDark" parent="Widget.MaterialComponents.NavigationView">
-        <item name="android:background">@color/photilsDarkBackground</item>
-    </style>
-
     <style name="SplashScreenTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
         <item name ="android:windowBackground">@drawable/splash_screen_background</item>
     </style>

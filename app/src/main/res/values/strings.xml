@@ -9,6 +9,8 @@
     <string name="keywhat_action_copy">Copy</string>
 
     <string name="menu_keywhat">Keywhat</string>
+    <string name="menu_inspiration">Inspiration</string>
+
     <string name="keywhat_share">Get Hashtags</string>
     <string name="keywhat_copy_success">The hashtags has been copied to clipboard.</string>
     <string name="title_activity_splash_screen">SplashScreen</string>
@@ -19,4 +21,7 @@
     <string name="keywhat_error_title">Error</string>
     <string name="keywhat_error_message">An error occurred while executing the algorithm.\n\n%s</string>
     <string name="keywhat_error_btn_ok">That\'s a pity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -5,12 +5,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -18,9 +23,12 @@ import com.google.android.gms.ads.InterstitialAd;
 
 
 public class MainActivity extends AppCompatActivity
-        implements BottomNavigationView.OnNavigationItemSelectedListener, Keywhat.OnKeywhatListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        Keywhat.OnKeywhatListener,
+        Inspiration.OnInspirationListener {
 
     private Toolbar mToolbar;
+    private DrawerLayout mDrawer;
     private InterstitialAd mInterstitialAd;
     private int mCurrentMenu = R.id.nav_keywhat;
 
@@ -45,10 +53,15 @@ public class MainActivity extends AppCompatActivity
         mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
+        mDrawer = findViewById(R.id.main_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-        BottomNavigationView bottomBar =findViewById(R.id.bottm_navigation);
-        bottomBar.setOnNavigationItemSelectedListener(this);
-        bottomBar.getMenu().getItem(0).setChecked(true);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().getItem(0).setChecked(true);
 
         Fragment f = null;
         String title = "";
@@ -79,8 +92,6 @@ public class MainActivity extends AppCompatActivity
                 changeFragment(R.id.nav_keywhat);
             }
         }
-
-
 
 
 
@@ -135,10 +146,12 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_keywhat) {
             // Handle the camera action
             fragment = new Keywhat();
+            title = getResources().getString(R.string.menu_keywhat);
         }
-        /*else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
+        else if (id == R.id.nav_inspiration) {
+            fragment = new Inspiration();
+            title = getResources().getString(R.string.menu_inspiration);
+        }/* else if (id == R.id.nav_slideshow) {
 
         }*/
 
@@ -147,12 +160,11 @@ public class MainActivity extends AppCompatActivity
             FragmentTransaction  ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment, "KEYWHAT");
             ft.commit();
-
-            title = getResources().getString(R.string.menu_keywhat);
         }
 
         //fragment.setRetainInstance(true);
         getSupportActionBar().setTitle(title);
+        mDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -170,11 +182,26 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.main_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public void onRequestTags() { }
 
     @Override
     public void onTagsAvailable() {
         if(mInterstitialAd.isLoaded())
             mInterstitialAd.show();
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 }
