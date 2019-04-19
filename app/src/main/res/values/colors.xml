@@ -3,6 +3,7 @@
     <color name="colorPrimary">#b93c3c</color>
     <color name="colorPrimaryDark">#830016</color>
     <color name="colorAccent">#f06d67</color>
+    <color name="photilsBlackAlpha">#EE333333</color>
     <color name="photilsDarkBackground">#333</color>
     <color name="photilsDarkButton">#424242</color>
     <color name="photilsRed">#b93c3c</color>

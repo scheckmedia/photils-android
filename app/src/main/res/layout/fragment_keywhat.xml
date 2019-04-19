@@ -1,133 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/keywhat_fragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     android:background="@color/photilsDarkBackground"
-    android:orientation="vertical"
-    android:padding="10dp"
-    android:paddingBottom="0dp"
-    tools:context=".Keywhat">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/keywhat_upload_container"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.5"
-        android:background="@color/photilsDarkButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:paddingBottom="0dp"
+        tools:context=".Keywhat">
 
-        <ImageView
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:id="@+id/keywhat_image_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            android:src="@drawable/ic_add_a_photo_black_24dp"
-            android:tint="@color/photilsDarkRedTransperent"
-            app:layout_constraintBottom_toBottomOf="parent"
+        <!-- TODO: Update blank fragment layout -->
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/keywhat_upload_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
+            android:background="@color/photilsDarkButton"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
-    </android.support.constraint.ConstraintLayout>
+            app:layout_constraintStart_toStartOf="parent">
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/keywhat_tags_label"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginTop="20dp"
-        android:layout_weight="0">
-
-        <TextView
-            android:id="@+id/keywhat_lbl_tags"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:paddingTop="5dp"
-            android:text="Tags"
-            android:textAlignment="viewStart"
-            android:textColor="@color/photilsText"
-            android:textSize="30sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <CheckBox
-            android:id="@+id/keywhat_cb_hashtag"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:buttonTint="@color/photilsText"
-            android:text="#"
-            android:textColor="@color/photilsText"
-            android:textSize="24sp"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </android.support.constraint.ConstraintLayout>
-
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/keywhat_tag_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="0.4">
-
-        <ScrollView
-            android:id="@+id/scrollView2"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_margin="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:fadeScrollbars="true"
-            android:fadingEdge="horizontal"
-            android:fadingEdgeLength="10dp"
-            app:layout_constraintBottom_toTopOf="@+id/keywhat_progress"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <com.adroitandroid.chipcloud.ChipCloud
-                android:id="@+id/keywhat_tag_cloud"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:deselectedColor="@color/photilsDarkButton"
-                app:deselectedFontColor="#fefefe"
+            <ImageView
+                android:id="@+id/keywhat_image_view"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_add_a_photo_black_24dp"
+                android:tint="@color/photilsDarkRedTransperent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:selectedColor="@color/photilsDarkRedTransperent"
-                app:selectedFontColor="@color/photilsRed"
-                app:textSize="18sp" />
-        </ScrollView>
+                app:layout_constraintVertical_bias="0.0" />
+        </android.support.constraint.ConstraintLayout>
 
-        <ProgressBar
-            android:id="@+id/keywhat_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_margin="0dp"
-            android:indeterminate="true"
-            android:max="100"
-            android:progress="0"
-            android:progressTint="@color/photilsRed"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/keywhat_tags_label"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:layout_weight="0">
 
-    </android.support.constraint.ConstraintLayout>
+            <TextView
+                android:id="@+id/keywhat_lbl_tags"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:paddingTop="5dp"
+                android:text="Tags"
+                android:textAlignment="viewStart"
+                android:textColor="@color/photilsText"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-</LinearLayout>
+            <CheckBox
+                android:id="@+id/keywhat_cb_hashtag"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:buttonTint="@color/photilsText"
+                android:text="#"
+                android:textColor="@color/photilsText"
+                android:textSize="24sp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/keywhat_tag_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.4">
+
+            <ScrollView
+                android:id="@+id/scrollView2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:fadeScrollbars="true"
+                android:fadingEdge="horizontal"
+                android:fadingEdgeLength="10dp"
+                app:layout_constraintBottom_toTopOf="@+id/keywhat_progress"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.adroitandroid.chipcloud.ChipCloud
+                    android:id="@+id/keywhat_tag_cloud"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:deselectedColor="@color/photilsDarkButton"
+                    app:deselectedFontColor="#fefefe"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:selectedColor="@color/photilsDarkRedTransperent"
+                    app:selectedFontColor="@color/photilsRed"
+                    app:textSize="18sp" />
+            </ScrollView>
+
+            <ProgressBar
+                android:id="@+id/keywhat_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="0dp"
+                android:indeterminate="true"
+                android:max="100"
+                android:progress="0"
+                android:progressTint="@color/photilsRed"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/keywhat_permission_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/photilsBlackAlpha"
+        android:animateLayoutChanges="true"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/keywhat_tv_permission"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="20dp"
+            android:justificationMode="inter_word"
+            android:textColor="@color/photilsText" />
+
+        <Button
+            android:id="@+id/keywhat_btn_permission_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center"
+            android:backgroundTint="@color/photilsDarkRed"
+            android:text="@string/open_permission" />
+
+    </FrameLayout>
+</FrameLayout>

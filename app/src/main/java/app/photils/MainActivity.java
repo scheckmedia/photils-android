@@ -3,9 +3,11 @@ package app.photils;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -54,10 +56,13 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
 
         mDrawer = findViewById(R.id.main_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawer.addDrawerListener(toggle);
-        toggle.syncState();
+
+        //disable drawer until inspiration mode is not ready
+        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        //ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar,
+        //        R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        //mDrawer.addDrawerListener(toggle);
+        //toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -83,7 +88,7 @@ public class MainActivity extends AppCompatActivity
             if(f != null) {
                 //f.setRetainInstance(true);
                 FragmentTransaction  ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, f, "KEYWHAT");
+                ft.replace(R.id.content_frame, f, title);
                 ft.commit();
 
                 getSupportActionBar().setTitle(title);
@@ -92,25 +97,27 @@ public class MainActivity extends AppCompatActivity
                 changeFragment(R.id.nav_keywhat);
             }
         }
-
-
-
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        Keywhat fragment = (Keywhat) getSupportFragmentManager().findFragmentByTag("KEYWHAT");
+        Keywhat fragment = (Keywhat) getSupportFragmentManager().findFragmentByTag("Keywhat");
         if(fragment != null && fragment.isVisible()) {
             outState.putParcelable("fragmentState", fragment.getState());
         }
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.keyhwat_actions, menu);
+        getMenuInflater().inflate(R.menu.main_actions, menu);
         return true;
     }
 
@@ -120,6 +127,11 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if(id == R.id.main_action_info) {
+            Info f = Info.newInstance(mCurrentMenu);
+            f.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.InfoDialog);
+            f.show(getSupportFragmentManager(), "InfoDialog");
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -158,7 +170,7 @@ public class MainActivity extends AppCompatActivity
         if(fragment != null)
         {
             FragmentTransaction  ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, fragment, "KEYWHAT");
+            ft.replace(R.id.content_frame, fragment, title);
             ft.commit();
         }
 
@@ -177,7 +189,9 @@ public class MainActivity extends AppCompatActivity
     public void onTagSelectedSize(int size) {
         int numItems = mToolbar.getMenu().size();
         for(int i = 0; i < numItems; i++) {
-            getmToolbar().getMenu().getItem(i).setVisible( size > 0);
+            MenuItem item = getmToolbar().getMenu().getItem(i);
+            if(item.getOrder() > 100)
+                item.setVisible( size > 0);
         }
     }
 

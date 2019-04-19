@@ -5,23 +5,53 @@
     <string name="nav_header_title">Android Studio</string>
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="keywhat_action_share">Share</string>
-    <string name="keywhat_action_copy">Copy</string>
+
+    <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="api_tflite_error">Could not load the required library to execute the tag suggestion algorithm.</string>
+    <string name="open_permission">Open Permissions</string>
+    <string name="info_ok">Alrighty</string>
 
     <string name="menu_keywhat">Keywhat</string>
     <string name="menu_inspiration">Inspiration</string>
+    <string name="main_action_info">About</string>
 
+    <string name="keywhat_action_share">Share</string>
+    <string name="keywhat_action_copy">Copy</string>
     <string name="keywhat_share">Get Hashtags</string>
     <string name="keywhat_copy_success">The hashtags has been copied to clipboard.</string>
-    <string name="title_activity_splash_screen">SplashScreen</string>
-
-
-    <string name="api_tflite_error">Could not load the required library to execute the tag suggestion algorithm.</string>
-
     <string name="keywhat_error_title">Error</string>
     <string name="keywhat_error_message">An error occurred while executing the algorithm.\n\n%s</string>
     <string name="keywhat_error_btn_ok">That\'s a pity</string>
+    <string name="keywhat_permission_explanation">
+        <![CDATA[
+        <h1>Permission Required</h1>
+        <p>
+            <i>Keywhat</i> requires permissions to read your local storage. Without this permission <i>Keywhat</i> is not able to open your image and without an image it is not possible to suggest keywords. Until the permission is denied this feature can not be used.
+        </p>
+        ]]>
+    </string>
+    <string name="inspiration_permission_explanation">
+        <![CDATA[
+        <h1>Permission Required</h1>
+        <p>
+            <i>Inspiration</i> requires permissions to read your local storage. Without this permission <i>Keywhat</i> is not able to open your image and without an image it is not possible to suggest keywords. Until the permission is denied this feature can not be used.
+        </p>
+        ]]>
+    </string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="info_keywhat">
+        <![CDATA[
+        <h1>Keywhat</h1>
+        <p>
+            Take a picture and let <i>Keywhat</i> suggest many hashtags for your image. For every image a neural network is calculating features to extract informations of your image locally. After this, the calculated feature will be sent to our backend for a keyword lookup. The size of this feature will be ~1.3 kB.
+        </p>
+        <p>
+            <b>It should be noted that no recognizable image data leave your phone! </b>
+        </p>
+
+        <p>
+            After processing your selected image you are able to select multiple hashtags from a list of suggestions. If you select at least one hashtag you have the opportunity to share your image with the selected tags. If an external app like WhatsApp support it, the selected tags will be used as image description. Unfortunately there exists no function like this for <b>Instagram</b>. Because of this, after you share the image with Instagram, the selected hashtags are copied to your clipboard. At the point when Instagram ask you for the image description you are able to paste the selected keywords from your clipboard.
+        </p>
+        ]]>
+    </string>
 </resources>

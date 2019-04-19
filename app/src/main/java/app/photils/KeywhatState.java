@@ -1,9 +1,11 @@
 package app.photils;
 
 import android.net.Uri;
+import android.os.BadParcelableException;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -47,11 +49,12 @@ public class KeywhatState implements Parcelable {
         mAliasEnabled = in.readByte() != 0;
 
         List<String> tmp = new ArrayList<>();
-        in.readStringList(tmp);
+        in.readList(tmp,null);
         for(String v : tmp)
             mSelectedTags.add(v);
-
-        mActiveUri = in.readParcelable(Uri.class.getClassLoader());
+        try {
+            mActiveUri = in.readParcelable(Uri.class.getClassLoader());
+        } catch (BadParcelableException ex) { }
     }
 
     public void addSelectedTag(String tag) {

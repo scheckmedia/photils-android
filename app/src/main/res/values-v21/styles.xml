@@ -4,5 +4,7 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@color/photilsDarkBackground</item>
+        <item name="android:fontFamily">@font/rounded_elegance</item>
+        <item name="fontFamily">@font/rounded_elegance</item>
     </style>
 </resources>

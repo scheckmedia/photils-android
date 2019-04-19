@@ -15,12 +15,14 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.text.HtmlCompat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +32,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adroitandroid.chipcloud.ChipCloud;
@@ -56,12 +59,11 @@ import java.util.List;
 public class Keywhat extends Fragment implements ChipListener {
 // TODO: Rename and change types of parameters
 
-    private int IMAGE_SELECTION_RESULT = 1;
-    static final int PERMISSION_READ_CODE = 1;
-    static final int PERMISSION_INTERNET_CODE = 2;
-    static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 101;
-
+    final static int PERMISSION_READ = 0;
     final static int mInputSize = 256;
+
+    private int IMAGE_SELECTION_RESULT = 1;
+    private View mOverlay;
     private ProgressBar mProgressBar;
     private ChipCloud mCloud;
     private KeywhatState mKeywhatState = new KeywhatState();
@@ -93,7 +95,6 @@ public class Keywhat extends Fragment implements ChipListener {
     public KeywhatState getState() {
         return mKeywhatState;
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -222,8 +223,12 @@ public class Keywhat extends Fragment implements ChipListener {
         inflater.inflate(R.menu.keyhwat_actions, menu);
 
         int size = menu.size();
-        for(int i = 0; i < size; i++)
-            menu.getItem(i).setVisible(this.mKeywhatState.getSelectedTags().size() > 0);
+        for(int i = 0; i < size; i++) {
+            MenuItem item = menu.getItem(i);
+
+            if(item.getOrder() > 100)
+                item.setVisible(this.mKeywhatState.getSelectedTags().size() > 0);
+        }
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -236,11 +241,10 @@ public class Keywhat extends Fragment implements ChipListener {
         View  v = inflater.inflate(R.layout.fragment_keywhat, container, false);
         mProgressBar = v.findViewById(R.id.keywhat_progress);
         mImageView = v.findViewById(R.id.keywhat_image_view);
+        mOverlay = v.findViewById(R.id.keywhat_permission_overlay);
         mAlias = v.findViewById(R.id.keywhat_cb_hashtag);
         mCloud = v.findViewById(R.id.keywhat_tag_cloud);
         mCloud.setChipListener(this);
-
-        checkPermission();
 
         mImageView.setOnClickListener(v1 -> {
             Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -252,10 +256,29 @@ public class Keywhat extends Fragment implements ChipListener {
             updateTagCloud();
         });
 
+        TextView tv = mOverlay.findViewById(R.id.keywhat_tv_permission);
+        tv.setText(HtmlCompat.fromHtml(
+                getString(R.string.keywhat_permission_explanation),
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+        ));
+
+        mOverlay.findViewById(R.id.keywhat_btn_permission_settings).setOnClickListener( event -> {
+            Intent intent = new Intent();
+            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+        });
+
         return v;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
 
+        checkPermission();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -291,6 +314,27 @@ public class Keywhat extends Fragment implements ChipListener {
             mKeyhwatListener.onTagSelectedSize(size);
     }
 
+    private void checkPermission() {
+        String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
+        if(getContext().checkSelfPermission(permission)
+                != PackageManager.PERMISSION_GRANTED) {
+            mOverlay.setVisibility(View.VISIBLE);
+            requestPermissions(     new String[]{permission},
+                    PERMISSION_READ
+            );
+
+        } else {
+            mOverlay.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == PERMISSION_READ && grantResults.length > 0) {
+            int state = grantResults[0] == PackageManager.PERMISSION_GRANTED ? View.GONE : View.VISIBLE;
+            mOverlay.setVisibility(state);
+        }
+    }
 
     /**
      * This interface must be implemented by activities that contain this
@@ -311,56 +355,6 @@ public class Keywhat extends Fragment implements ChipListener {
 
     public void setListener(OnKeywhatListener listener) {
         this.mKeyhwatListener = listener;
-    }
-
-    // TODO: remove from here and put it else
-    private void checkPermission(){
-        boolean canRead = ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-
-        boolean hasInternet = ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED;
-
-        List<String> reqPermissionList = new ArrayList<>();
-
-        if(!canRead) {
-            reqPermissionList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
-
-        if(!hasInternet) {
-            reqPermissionList.add(Manifest.permission.INTERNET);
-        }
-
-        if(!reqPermissionList.isEmpty()) {
-            ActivityCompat.requestPermissions(getActivity(), reqPermissionList
-                            .toArray(new String[reqPermissionList.size()]),
-                    REQUEST_ID_MULTIPLE_PERMISSIONS);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_READ_CODE: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                } else {
-
-                }
-                return;
-            }
-
-            case PERMISSION_INTERNET_CODE: {
-                if (grantResults.length > 0
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-
-                } else {
-
-                }
-                return;
-            }
-        }
     }
 
 
