@@ -1,4 +1,4 @@
-package app.photils;
+package app.photils.api;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
@@ -23,17 +23,19 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Api {
+import app.photils.R;
+
+public class PhotilsApi {
 
     protected Interpreter mInterpreter;
 
     final static String URL = "https://api.photils.app/";
 
-    private static Api mInstance;
+    private static PhotilsApi mInstance;
     private RequestQueue mRequestQueue;
     private Context mContext;
 
-    private Api(Context ctx) {
+    private PhotilsApi(Context ctx) {
         this.mContext = ctx;
         mRequestQueue = Volley.newRequestQueue(ctx);
         mRequestQueue.start();
@@ -43,11 +45,11 @@ public class Api {
         } catch (Exception ex) {}
     }
 
-    public static synchronized Api getInstance(Context ctx) {
-        if(Api.mInstance == null)
-            Api.mInstance = new Api(ctx);
+    public static synchronized PhotilsApi getInstance(Context ctx) {
+        if(PhotilsApi.mInstance == null)
+            PhotilsApi.mInstance = new PhotilsApi(ctx);
 
-        return Api.mInstance;
+        return PhotilsApi.mInstance;
     }
 
     public void getTags(ByteBuffer img, OnTagsReceived callback) {

@@ -1,41 +1,49 @@
 package app.photils;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.text.HtmlCompat;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import org.rajawali3d.materials.Material;
+import org.rajawali3d.materials.plugins.SpriteSheetMaterialPlugin;
 import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.view.SurfaceView;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import app.photils.api.FlickrApi;
+import app.photils.api.FlickrImage;
+import app.photils.inspiration.InspirationListener;
+import app.photils.inspiration.InspirationRenderer;
 
 
 /**
@@ -46,7 +54,9 @@ import java.util.ArrayList;
  * Use the {@link Inspiration#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Inspiration extends Fragment implements SensorEventListener {
+
+public class Inspiration extends Fragment implements SensorEventListener, InspirationListener,
+        LocationListener {
     private View mOverlay;
     private static int PERMISSION_CODE = 0;
     private static float LOWPASS_ALPHA = 0.1f;
@@ -54,11 +64,11 @@ public class Inspiration extends Fragment implements SensorEventListener {
     private OnInspirationListener mListener;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private Renderer mRenderer;
+    private InspirationRenderer mRenderer;
+    private ProgressBar mProgress;
+    private LocationManager mLocationManager;
 
-    public Inspiration() {
-
-    }
+    public Inspiration() { }
 
     @Override
     public void onResume() {
@@ -107,17 +117,21 @@ public class Inspiration extends Fragment implements SensorEventListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         super.onCreateView(inflater, container, savedInstanceState);
-        FrameLayout layout = (FrameLayout)inflater.inflate(R.layout.fragment_inspiration, container, false);
+        FrameLayout layout = (FrameLayout) inflater.inflate(R.layout.fragment_inspiration, container, false);
 
         final SurfaceView surface = new SurfaceView(getContext());
         surface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         surface.setFrameRate(60.0);
-        ((FrameLayout)layout.findViewById(R.id.inspiration_main)).addView(surface);
 
-        mRenderer = new Renderer(getContext());
+        ((FrameLayout) layout.findViewById(R.id.inspiration_main)).addView(surface);
+
+        mProgress = layout.findViewById(R.id.inspiration_progress);
+
+        mRenderer = new InspirationRenderer(getContext());
         surface.setSurfaceRenderer(mRenderer);
+        mRenderer.setInspirationListener(this);
 
-        mSensorManager = (SensorManager)getActivity().getSystemService(Context.SENSOR_SERVICE);
+        mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
         mOverlay = layout.findViewById(R.id.inspiration_permission_overlay);
@@ -127,7 +141,7 @@ public class Inspiration extends Fragment implements SensorEventListener {
                 HtmlCompat.FROM_HTML_MODE_LEGACY
         ));
 
-        mOverlay.findViewById(R.id.inspiration_btn_permission_settings).setOnClickListener( event -> {
+        mOverlay.findViewById(R.id.inspiration_btn_permission_settings).setOnClickListener(event -> {
             Intent intent = new Intent();
             intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
             Uri uri = Uri.fromParts("package", getActivity().getPackageName(), null);
@@ -151,24 +165,39 @@ public class Inspiration extends Fragment implements SensorEventListener {
 
         ArrayList<String> requestPermission = new ArrayList<>();
 
-        for(String permission : requiredPermission) {
+        for (String permission : requiredPermission) {
             if (getContext().checkSelfPermission(permission) !=
                     PackageManager.PERMISSION_GRANTED)
                 requestPermission.add(permission);
         }
 
-        if(requestPermission.size() > 0) {
+        if (requestPermission.size() > 0) {
             mOverlay.setVisibility(View.VISIBLE);
             requestPermissions(requestPermission.toArray(new String[0]), PERMISSION_CODE);
 
         } else {
             mOverlay.setVisibility(View.GONE);
+
+            if(mLocationManager == null)
+                initLocationManager();
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void initLocationManager() {
+        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String bestProvider = mLocationManager.getBestProvider(criteria,true);
+        Location location =  mLocationManager.getLastKnownLocation(bestProvider);
+        if(location != null) {
+            onLocationChanged(location);
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == PERMISSION_CODE && grantResults.length == 2) {
+        if (requestCode == PERMISSION_CODE && grantResults.length == 2) {
             int state = grantResults[0] == PackageManager.PERMISSION_GRANTED ? View.GONE : View.VISIBLE;
             mOverlay.setVisibility(state);
         }
@@ -200,13 +229,15 @@ public class Inspiration extends Fragment implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if(event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+        if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             mRotationVector = lowPass(event.values.clone(), mRotationVector);
+
             float[] rm = new float[16];
             SensorManager.getRotationMatrixFromVector(rm, mRotationVector);
             Matrix.invertM(rm, 0, rm, 0);
-
+            SensorManager.remapCoordinateSystem(rm, SensorManager.AXIS_X,SensorManager.AXIS_MINUS_Z, rm);
             Quaternion q = new Quaternion().fromMatrix(new Matrix4(rm));
+
             int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
             switch (rotation) {
                 case Surface.ROTATION_0:
@@ -235,12 +266,68 @@ public class Inspiration extends Fragment implements SensorEventListener {
     borrowed from
     https://github.com/raweng/augmented-reality-view/blob/master/ARView/src/com/raw/arview/ARView.java#L262
      */
-    protected float[] lowPass( float[] input, float[] output ) {
-        if ( output == null ) return input;
-        for ( int i=0; i<input.length; i++ ) {
+    protected float[] lowPass(float[] input, float[] output) {
+        if (output == null) return input;
+        for (int i = 0; i < input.length; i++) {
             output[i] = output[i] + LOWPASS_ALPHA * (input[i] - output[i]);
         }
         return output;
+    }
+
+    @Override
+    public void onGazeProgress(int progress) {
+        getActivity().runOnUiThread(() -> {
+            mProgress.setProgress(progress);
+        });
+    }
+
+    @Override
+    public void onGazeSelected() {
+        getActivity().runOnUiThread(() -> {
+            mProgress.setVisibility(View.INVISIBLE);
+        });
+    }
+
+    @Override
+    public void onGazeUnselect() {
+        getActivity().runOnUiThread(() -> {
+            mProgress.setVisibility(View.VISIBLE);
+        });
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.v(getTag(), "location: " + location.getLatitude() + " -- " + location.getLongitude());
+        FlickrApi.FlickrImages images = FlickrApi.getInstance(getContext()).getImagesAtLocation(
+                location.getLatitude(), location.getLongitude(), 10.0);
+
+        mRenderer.setWorldPosition(Utils.latLonToXYZ(location.getLatitude(), location.getLongitude()));
+        images.getNextImages(new FlickrApi.OnImageReceived() {
+            @Override
+            public void onSuccess(ArrayList<FlickrImage> images) {
+                mRenderer.addImages(images);
+            }
+
+            @Override
+            public void onFail(FlickrApi.ApiException ex) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 
     /**
@@ -258,50 +345,4 @@ public class Inspiration extends Fragment implements SensorEventListener {
         void onFragmentInteraction(Uri uri);
     }
 
-    private class Renderer extends org.rajawali3d.renderer.Renderer {
-        private Context mCtx;
-        private Quaternion mCameraOrientation = new Quaternion();
-        private final Object mCameraOrientationLock = new Object();
-
-        public Renderer(Context context) {
-            super(context);
-            mCtx = context;
-            setFrameRate(60);
-        }
-
-        @Override
-        protected void initScene() {
-            Sphere s = new Sphere(1,24,24);
-            s.setY(10);
-            s.setZ(0.5);
-            s.setMaterial(new Material());
-            getCurrentScene().addChild(s);
-            getCurrentCamera().setZ(0);
-
-        }
-
-        @Override
-        protected void onRender(long ellapsedRealtime, double deltaTime) {
-            super.onRender(ellapsedRealtime, deltaTime);
-
-            getCurrentCamera().setRotation(mCameraOrientation);
-        }
-
-        @Override
-        public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
-
-        }
-
-        @Override
-        public void onTouchEvent(MotionEvent event) {
-
-        }
-
-        public void setSensorOrientation(Quaternion q)
-        {
-            synchronized (mCameraOrientationLock) {
-                mCameraOrientation.setAll(q);
-            }
-        }
-    }
 }

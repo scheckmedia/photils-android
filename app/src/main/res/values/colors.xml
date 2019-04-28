@@ -8,6 +8,7 @@
     <color name="photilsDarkButton">#424242</color>
     <color name="photilsRed">#b93c3c</color>
     <color name="photilsDarkRed">#b83c40</color>
-    <color name="photilsDarkRedTransperent">#FF644242</color>
+    <color name="photilsDarkRedTransparent">#88b83c40</color>
+    <color name="photilsMidRed">#FF644242</color>
     <color name="photilsText">#fff</color>
 </resources>

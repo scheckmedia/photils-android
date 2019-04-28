@@ -37,7 +37,7 @@
                 android:layout_marginBottom="20dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_add_a_photo_black_24dp"
-                android:tint="@color/photilsDarkRedTransperent"
+                android:tint="@color/photilsMidRed"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
@@ -113,7 +113,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:selectedColor="@color/photilsDarkRedTransperent"
+                        app:selectedColor="@color/photilsMidRed"
                         app:selectedFontColor="@color/photilsRed"
                         app:textSize="18sp" />
                 </ScrollView>

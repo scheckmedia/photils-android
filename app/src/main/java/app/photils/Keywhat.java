@@ -18,9 +18,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.text.HtmlCompat;
 import android.view.LayoutInflater;
@@ -44,8 +42,9 @@ import java.io.IOException;
 
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
+
+import app.photils.api.PhotilsApi;
 
 
 /**
@@ -69,7 +68,7 @@ public class Keywhat extends Fragment implements ChipListener {
     private KeywhatState mKeywhatState = new KeywhatState();
     private ImageView mImageView;
     private CheckBox mAlias;
-    private Api mApi;
+    private PhotilsApi mApi;
 
     private OnKeywhatListener mKeyhwatListener;
 
@@ -204,7 +203,7 @@ public class Keywhat extends Fragment implements ChipListener {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mApi = Api.getInstance(getActivity().getApplicationContext());
+        mApi = PhotilsApi.getInstance(getActivity().getApplicationContext());
         if(getArguments() != null)
         {
             Uri imageUri = getArguments().getParcelable("queuedImage");
@@ -363,7 +362,7 @@ public class Keywhat extends Fragment implements ChipListener {
             this.mKeyhwatListener.onRequestTags();
 
         toggleProgress(true);
-        Api.OnTagsReceived callback = new Api.OnTagsReceived() {
+        PhotilsApi.OnTagsReceived callback = new PhotilsApi.OnTagsReceived() {
             @Override
             public void onSuccess(List<String> tagList) {
                 mKeywhatState.getmTags().clear();
@@ -378,7 +377,7 @@ public class Keywhat extends Fragment implements ChipListener {
             }
 
             @Override
-            public void onFail(Api.ApiException ex) {
+            public void onFail(PhotilsApi.ApiException ex) {
                 toggleProgress(false);
 
                 new AlertDialog.Builder(getContext())

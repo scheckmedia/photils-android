@@ -8,6 +8,9 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import org.rajawali3d.math.MathUtil;
+import org.rajawali3d.math.vector.Vector3;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -15,7 +18,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class Utils {
-
     public static ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap, int inputSize) {
         bitmap = Bitmap.createScaledBitmap(bitmap, inputSize, inputSize,true);
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * inputSize * inputSize * 3);
@@ -57,6 +59,30 @@ public class Utils {
         matrix .setRectToRect(new RectF(0, 0, targetBmp.getWidth(), targetBmp.getHeight()), new RectF(0, 0, reqWidthInPixels, reqHeightInPixels), Matrix.ScaleToFit.CENTER);
         Bitmap scaledBitmap = Bitmap.createBitmap(targetBmp, 0, 0, targetBmp.getWidth(), targetBmp.getHeight(), matrix, true);
         return scaledBitmap;
+    }
+
+    public static Vector3 latLonToXYZ(double lat, double lon){
+        final double r = 6371; // km
+        lat = MathUtil.degreesToRadians(lat);
+        lon = MathUtil.degreesToRadians(lon);
+
+        final double x = r * Math.cos(lat) * Math.cos(lon);
+        final double y = r * Math.cos(lat) * Math.sin(lon);
+        final double z = r * Math.sin(lat);
+
+        return new Vector3(x,z,y);
+    }
+
+    public static double angleBetweenLocations(double lat1, double lon1, double lat2, double lon2) {
+        final double dLon = (lon2 - lon1);
+        final double y = Math.sin(dLon) * Math.cos(lat2);
+        final double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
+                * Math.cos(lat2) * Math.cos(dLon);
+        double bearing = Math.atan2(y, x);
+        bearing = MathUtil.radiansToDegrees(bearing);
+        bearing = (bearing + 360) % 360;
+        bearing = 360 - bearing;
+        return bearing;
     }
 }
 

@@ -56,13 +56,12 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(mToolbar);
 
         mDrawer = findViewById(R.id.main_layout);
+        //mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-        //disable drawer until inspiration mode is not ready
-        mDrawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        //ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar,
-        //        R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        //mDrawer.addDrawerListener(toggle);
-        //toggle.syncState();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(toggle);
+        toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
