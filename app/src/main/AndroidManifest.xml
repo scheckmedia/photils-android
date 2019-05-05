@@ -48,6 +48,7 @@
         <activity
             android:name=".MainActivity"
             android:label="photils"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

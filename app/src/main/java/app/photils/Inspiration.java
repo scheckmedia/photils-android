@@ -24,6 +24,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.text.HtmlCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,10 +57,10 @@ import app.photils.inspiration.InspirationRenderer;
  */
 
 public class Inspiration extends Fragment implements SensorEventListener, InspirationListener,
-        LocationListener {
+        LocationListener, View.OnTouchListener {
     private View mOverlay;
     private static int PERMISSION_CODE = 0;
-    private static float LOWPASS_ALPHA = 0.1f;
+    private static float LOWPASS_ALPHA = 0.05f;
     private float[] mRotationVector;
     private OnInspirationListener mListener;
     private SensorManager mSensorManager;
@@ -122,6 +123,7 @@ public class Inspiration extends Fragment implements SensorEventListener, Inspir
         final SurfaceView surface = new SurfaceView(getContext());
         surface.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         surface.setFrameRate(60.0);
+        surface.setOnTouchListener(this);
 
         ((FrameLayout) layout.findViewById(R.id.inspiration_main)).addView(surface);
 
@@ -130,6 +132,7 @@ public class Inspiration extends Fragment implements SensorEventListener, Inspir
         mRenderer = new InspirationRenderer(getContext());
         surface.setSurfaceRenderer(mRenderer);
         mRenderer.setInspirationListener(this);
+
 
         mSensorManager = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
@@ -156,6 +159,8 @@ public class Inspiration extends Fragment implements SensorEventListener, Inspir
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
+
+
 
     private void checkPermission() {
         String[] requiredPermission = new String[]{
@@ -186,13 +191,17 @@ public class Inspiration extends Fragment implements SensorEventListener, Inspir
     @SuppressLint("MissingPermission")
     private void initLocationManager() {
         mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 10, this);
+        //mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 10, this);
+
         Criteria criteria = new Criteria();
         String bestProvider = mLocationManager.getBestProvider(criteria,true);
         Location location =  mLocationManager.getLastKnownLocation(bestProvider);
         if(location != null) {
             onLocationChanged(location);
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         }
+
+
     }
 
     @Override
@@ -236,6 +245,7 @@ public class Inspiration extends Fragment implements SensorEventListener, Inspir
             SensorManager.getRotationMatrixFromVector(rm, mRotationVector);
             Matrix.invertM(rm, 0, rm, 0);
             SensorManager.remapCoordinateSystem(rm, SensorManager.AXIS_X,SensorManager.AXIS_MINUS_Z, rm);
+
             Quaternion q = new Quaternion().fromMatrix(new Matrix4(rm));
 
             int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
@@ -297,20 +307,26 @@ public class Inspiration extends Fragment implements SensorEventListener, Inspir
 
     @Override
     public void onLocationChanged(Location location) {
+        if(!mRenderer.isIsWorldScene())
+            return;
+
         Log.v(getTag(), "location: " + location.getLatitude() + " -- " + location.getLongitude());
         FlickrApi.FlickrImages images = FlickrApi.getInstance(getContext()).getImagesAtLocation(
                 location.getLatitude(), location.getLongitude(), 10.0);
 
-        mRenderer.setWorldPosition(Utils.latLonToXYZ(location.getLatitude(), location.getLongitude()));
+
+        mRenderer.setWorldPosition(location.getLatitude(), location.getLongitude());
         images.getNextImages(new FlickrApi.OnImageReceived() {
             @Override
             public void onSuccess(ArrayList<FlickrImage> images) {
-                mRenderer.addImages(images);
+                mRenderer.clearGroups();
+                mRenderer.addImagesToGroup(images);
+                mRenderer.addImageGroupToScene();
             }
 
             @Override
             public void onFail(FlickrApi.ApiException ex) {
-
+                Log.v(getTag(), "fail: " + ex.getMessage());
             }
         });
     }
@@ -328,6 +344,12 @@ public class Inspiration extends Fragment implements SensorEventListener, Inspir
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        mRenderer.onTouchEvent(event);
+        return true;
     }
 
     /**

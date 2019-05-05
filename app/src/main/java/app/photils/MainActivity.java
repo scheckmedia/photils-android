@@ -15,8 +15,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
 import com.google.android.gms.ads.AdListener;
@@ -34,9 +37,11 @@ public class MainActivity extends AppCompatActivity
     private InterstitialAd mInterstitialAd;
     private int mCurrentMenu = R.id.nav_keywhat;
 
-    public Toolbar getmToolbar() {
+
+    public Toolbar getToolbar() {
         return mToolbar;
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,6 +185,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return super.onTouchEvent(event);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -188,7 +198,7 @@ public class MainActivity extends AppCompatActivity
     public void onTagSelectedSize(int size) {
         int numItems = mToolbar.getMenu().size();
         for(int i = 0; i < numItems; i++) {
-            MenuItem item = getmToolbar().getMenu().getItem(i);
+            MenuItem item = getToolbar().getMenu().getItem(i);
             if(item.getOrder() > 100)
                 item.setVisible( size > 0);
         }

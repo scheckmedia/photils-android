@@ -40,6 +40,7 @@ public class CustomSpriteSheetMaterialPlugin implements IMaterialPlugin {
     public void play() {
         mVertexShader.play();
     }
+    public void reset() { mVertexShader.reset(); }
 
     public void pause() {
         mVertexShader.pause();
@@ -146,6 +147,11 @@ public class CustomSpriteSheetMaterialPlugin implements IMaterialPlugin {
         public void play() {
             mStartTime = SystemClock.elapsedRealtime();
             mIsPlaying = true;
+        }
+
+        public void reset() {
+            mCurrentFrame = 0;
+            mIsPlaying = false;
         }
 
         public void pause() {
