@@ -47,6 +47,7 @@ import org.rajawali3d.util.RayPicker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -91,8 +92,9 @@ public class InspirationRenderer extends Renderer
     private boolean mActiveGaze = false;
     private boolean mIsWorldScene = true;
     private Vector2 mCamLatLon = new Vector2();
-    private Object3D mGalleryImages = new Object3D("images");
     private ArrayList<ArrayList<FlickrImage>> mGroupedImages = new ArrayList<>();
+    private ArrayList<Object3D> mGalleryImages = new ArrayList<>();
+    private ArrayList<Object3D> mObjectsToRemove = new ArrayList<>();
 
     private GestureDetector mDetector;
 
@@ -245,10 +247,19 @@ public class InspirationRenderer extends Renderer
 
         //Log.v(BuildConfig.APPLICATION_ID, "rotation" + MathUtil.radiansToDegrees(mCameraOrientation.getRotationY()));
 
+        Iterator<Object3D> it = mObjectsToRemove.iterator();
+        while(it.hasNext()) {
+            Object3D child = it.next();
+            Log.v(BuildConfig.APPLICATION_ID, "remove child " + child.getName());
+            mGalleryScene.removeChild(child);
+            it.remove();
+        }
+
+        mPicker.getObjectAt((float)mCenter.getX(), (float)mCenter.getY());
+
         if (!mIsWorldScene)
             return;
 
-        mPicker.getObjectAt((float)mCenter.getX(), (float)mCenter.getY());
         if(mCameraTexture != null)
             mCameraTexture.update();
 
@@ -328,7 +339,7 @@ public class InspirationRenderer extends Renderer
 
     @Override
     public void onObjectPicked(@NonNull Object3D object) {
-        if(object instanceof ScreenQuad || !object.getName().contains("aperture"))
+        if(object instanceof ScreenQuad)
             return;
 
         if(mFocusingObject == null) {
@@ -336,8 +347,9 @@ public class InspirationRenderer extends Renderer
             mFocusStartTime = System.currentTimeMillis();
         }
 
-
         if (object == mFocusingObject && mActiveGaze == false) {
+            onGazeHover();
+
             long delta = System.currentTimeMillis() - mFocusStartTime;
 
             if(mListener != null) {
@@ -355,19 +367,26 @@ public class InspirationRenderer extends Renderer
 
     @Override
     public void onNoObjectPicked() {
-        if(mFocusingObject != null) {
-            CustomSpriteSheetMaterialPlugin plg = (CustomSpriteSheetMaterialPlugin)mFocusingObject.getMaterial()
-                    .getPlugin(CustomSpriteSheetMaterialPlugin.class);
+        if(mFocusingObject == null)
+            return;
 
+        CustomSpriteSheetMaterialPlugin plg = (CustomSpriteSheetMaterialPlugin)mFocusingObject.getMaterial()
+                .getPlugin(CustomSpriteSheetMaterialPlugin.class);
+
+        if(plg != null)
             plg.reset();
 
-            mFocusingObject = null;
-            mActiveGaze = false;
+        if(!mIsWorldScene) {
+            mFocusingObject.getMaterial().setColorInfluence(0.0f);
+        }
 
-            if(mListener != null) {
-                mListener.onGazeProgress(0);
-                onGazeUnselect();
-            }
+
+        mFocusingObject = null;
+        mActiveGaze = false;
+
+        if(mListener != null) {
+            mListener.onGazeProgress(0);
+            onGazeUnselect();
         }
     }
 
@@ -446,6 +465,23 @@ public class InspirationRenderer extends Renderer
 
         mActiveGaze = true;
 
+        if(mIsWorldScene)
+            selectImageGroup();
+        else
+            selectImage();
+
+    }
+
+    private void onGazeHover() {
+        if(mFocusingObject == null)
+            return;
+
+        if(!mIsWorldScene) {
+            mFocusingObject.getMaterial().setColorInfluence(0.2f);
+        }
+    }
+
+    private void selectImageGroup() {
         Material mat = mFocusingObject.getMaterial();
         CustomSpriteSheetMaterialPlugin sprite = ((CustomSpriteSheetMaterialPlugin)
                 mat.getPlugin(CustomSpriteSheetMaterialPlugin.class));
@@ -501,6 +537,9 @@ public class InspirationRenderer extends Renderer
         mWorldScene.registerAnimation(anim);
         anim.play();
     }
+    private void selectImage() {
+
+    }
 
     private void onGazeUnselect() {
         mActiveGaze = false;
@@ -512,23 +551,14 @@ public class InspirationRenderer extends Renderer
 
     private void resetGaze() {
         onNoObjectPicked();
-        mActiveGaze = false;
-        mFocusingObject = null;
     }
 
     private void placeImages(int groupIndex) {
-        for(int i = 0; i < mGalleryImages.getNumChildren(); i++) {
-            Object3D child = mGalleryImages.getChildAt(i);
-            mGalleryImages.removeChild(child);
-            mGalleryScene.removeChild(child);
+        for(Object3D child : mGalleryImages) {
+            mObjectsToRemove.add(child);
         }
 
-
         ArrayList<FlickrImage> imageGroup = mGroupedImages.get(groupIndex);
-
-        //Log.v(BuildConfig.APPLICATION_ID, "target: " + target);
-        double offset = (MathUtil.radiansToDegrees(mCameraOrientation.getRotationY()) + 360) % 360;
-        mGalleryScene.addChild(mGalleryImages);
 
         int cols = (int)Math.floor(Math.sqrt(imageGroup.size()));
         int rows = imageGroup.size() / cols;
@@ -537,10 +567,11 @@ public class InspirationRenderer extends Renderer
         double curveHalf = curve * 0.5;
         double sectors = curve / cols;
         double stacks = curve / rows;
-
         double r = 10.0;
 
-        Log.v(BuildConfig.APPLICATION_ID, "items: " + imageGroup.size() + " scene: " + mGalleryScene.getNumChildren());
+        //Log.v(BuildConfig.APPLICATION_ID, "target: " + target);
+        double offset = (MathUtil.radiansToDegrees(mCameraOrientation.getRotationY()) + 360) % 360;
+        offset -= curveDeg / 2.0 - mAngleSteps;
 
         for(int i = 0; i < imageGroup.size(); i++) {
             FlickrImage image = imageGroup.get(i);
@@ -563,18 +594,17 @@ public class InspirationRenderer extends Renderer
             // z and y are swapped
             Vector3 v = new Vector3(x, y, -z);
             image.enableLookAt();
-            image.setLookAt(mGalleryCamera.getPosition());
             image.setPosition(v);
+            image.setRotY(offset);
+            image.setLookAt(mGalleryCamera.getPosition());
 
-            //Log.v(BuildConfig.APPLICATION_ID, "v " + v);
-
-
-            mGalleryImages.addChild(image);
+            mGalleryScene.addChild(image);
+            mGalleryImages.add(image);
         }
 
-        mGalleryImages.setRotY(-(offset - curveDeg / 2.0));
 
-        Log.v(BuildConfig.APPLICATION_ID, "rot" + offset + "count: " + mGalleryImages.getNumChildren());
+
+        Log.v(BuildConfig.APPLICATION_ID, "rot" + offset + "count: " + mGalleryImages.size());
     }
 
     private void cropVideo() {

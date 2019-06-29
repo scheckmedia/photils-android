@@ -50,11 +50,6 @@ public class FlickrImage extends Plane {
         setMaterial(mMaterial);
     }
 
-    @Override
-    public int hashCode() {
-        return Integer.valueOf(mId);
-    }
-
     public void setLocation(double lat, double lon) {
         mLat = lat;
         mLon = lon;
