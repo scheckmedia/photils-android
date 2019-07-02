@@ -23,7 +23,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="SplashScreenTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name ="android:windowBackground">@drawable/splash_screen_background</item>
+        <item name="android:windowBackground">@drawable/splash_screen_background</item>
         <item name="android:fontFamily">@font/rounded_elegance</item>
         <item name="fontFamily">@font/rounded_elegance</item>
     </style>

@@ -3,9 +3,9 @@ package app.photils;
 
 import android.os.Bundle;
 import android.app.Fragment;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.text.HtmlCompat;
-import android.text.Html;
+import androidx.fragment.app.DialogFragment;
+import androidx.core.text.HtmlCompat;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

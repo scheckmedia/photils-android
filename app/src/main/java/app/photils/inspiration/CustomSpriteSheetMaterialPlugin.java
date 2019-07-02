@@ -1,12 +1,8 @@
 package app.photils.inspiration;
 
-import android.app.Activity;
 import android.opengl.GLES20;
 import android.os.SystemClock;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
-import org.rajawali3d.BuildConfig;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.plugins.IMaterialPlugin;
 import org.rajawali3d.materials.shaders.AShader;

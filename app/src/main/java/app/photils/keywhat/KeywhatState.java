@@ -1,11 +1,10 @@
-package app.photils;
+package app.photils.keywhat;
 
 import android.net.Uri;
 import android.os.BadParcelableException;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;

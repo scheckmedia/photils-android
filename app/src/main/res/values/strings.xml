@@ -10,11 +10,16 @@
     <string name="api_tflite_error">Could not load the required library to execute the tag suggestion algorithm.</string>
     <string name="open_permission">Open Permissions</string>
     <string name="info_ok">Alrighty</string>
+    <string name="save">Save</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
 
     <string name="menu_keywhat">Keywhat</string>
     <string name="menu_inspiration">Inspiration</string>
     <string name="main_action_info">About</string>
 
+    <string name="keywhat_action_custom_tags">About</string>
     <string name="keywhat_action_share">Share</string>
     <string name="keywhat_action_copy">Copy</string>
     <string name="keywhat_share">Get Hashtags</string>
@@ -54,4 +59,13 @@
         </p>
         ]]>
     </string>
+    <string name="title_activity_custom_tags">Custom Tags</string>
+    <string name="custom_tags_no_item_message">There are no custom tags yet.</string>
+    <string name="custom_tags_dialog_group">Group of Tag e.g. Landscape</string>
+    <string name="custom_tags_dialog_tag">Tag (without #)</string>
+    <string name="custom_tags_dialog_default">Selected by Default</string>
+    <string name="custom_tags_dialog_add_error_title">Tag already exists</string>
+    <string name="custom_tags_dialog_add_error_message">The tag <b>%1$s</b> you entered already exist in group <b>%2$s</b></string>
+    <string name="custom_tags_delete_title">Delete Tags?</string>
+    <string name="custom_tags_delete_message">Are you sure you want to delete %1$d tags?</string>
 </resources>

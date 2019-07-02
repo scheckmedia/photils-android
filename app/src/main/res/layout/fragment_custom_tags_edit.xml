@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="fill_horizontal|fill_vertical"
+    android:layout_margin="0dp"
+    android:background="@color/photilsDarkBackground"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="0dp"
+    tools:context=".Info">
+
+    <AutoCompleteTextView
+        android:id="@+id/tb_custom_tags_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/photilsDarkButton"
+        android:completionThreshold="1"
+        android:hint="@string/custom_tags_dialog_group"
+        android:textColor="@color/photilsText" />
+
+    <EditText
+        android:id="@+id/tb_custom_tags_tag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/photilsDarkButton"
+        android:hint="@string/custom_tags_dialog_tag"
+        android:textColor="@color/photilsText" />
+
+    <CheckBox
+        android:id="@+id/cb_custom_tags_default"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:buttonTint="@color/photilsDarkButton"
+        android:text="@string/custom_tags_dialog_default"
+        android:textColor="@color/photilsText"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/custom_tags_btn_dismiss"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/photilsDarkRed"
+            android:text="@android:string/cancel"
+            app:icon="@android:drawable/ic_menu_close_clear_cancel"
+            app:iconGravity="textStart" />
+
+        <Button
+            android:id="@+id/custom_tags_btn_save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/photilsDarkRed"
+            android:text="@string/save"
+            app:icon="@android:drawable/ic_menu_save"
+            app:iconGravity="textStart" />
+
+    </LinearLayout>
+
+</LinearLayout>

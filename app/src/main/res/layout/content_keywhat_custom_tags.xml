@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/photilsDarkBackground"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".keywhat.KeywhatCustomTag"
+    tools:showIn="@layout/activity_keywhat_custom_tags">
+
+    <ExpandableListView
+        android:id="@+id/custom_tags"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/photilsDarkButton"
+        android:dividerHeight="0.5dp"
+        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft" />
+
+    <TextView
+        android:id="@+id/custom_tags_item_items"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="@string/custom_tags_no_item_message"
+        android:textAlignment="center"
+        android:textColor="@color/photilsText"
+        android:visibility="gone" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

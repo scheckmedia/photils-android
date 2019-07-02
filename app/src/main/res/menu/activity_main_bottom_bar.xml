@@ -4,8 +4,8 @@
         android:id="@+id/nav_keywhat"
         android:icon="@drawable/ic_local_offer_black_24dp"
         android:title="@string/menu_keywhat" />
-    <item
-        android:id="@+id/nav_inspiration"
-        android:icon="@drawable/ic_image_black_24dp"
-        android:title="@string/menu_inspiration" />
+    <!--<item-->
+        <!--android:id="@+id/nav_inspiration"-->
+        <!--android:icon="@drawable/ic_image_black_24dp"-->
+        <!--android:title="@string/menu_inspiration" />-->
 </menu>

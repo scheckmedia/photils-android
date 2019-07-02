@@ -3,34 +3,33 @@ package app.photils;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.GestureDetector;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.navigation.NavigationView;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.widget.FrameLayout;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 
+import app.photils.keywhat.KeywhatCustomTag;
+import app.photils.keywhat.KeywhatState;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        Keywhat.OnKeywhatListener,
-        Inspiration.OnInspirationListener {
+        Keywhat.OnKeywhatListener/*,
+        Inspiration.OnInspirationListener*/ {
 
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
@@ -135,6 +134,10 @@ public class MainActivity extends AppCompatActivity
             Info f = Info.newInstance(mCurrentMenu);
             f.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.InfoDialog);
             f.show(getSupportFragmentManager(), "InfoDialog");
+        } else if(id == R.id.keywhat_action_custom_tags) {
+            Intent i = new Intent(this, KeywhatCustomTag.class);
+            startActivity(i);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -164,7 +167,7 @@ public class MainActivity extends AppCompatActivity
             fragment = new Keywhat();
             title = getResources().getString(R.string.menu_keywhat);
         }
-        else if (id == R.id.nav_inspiration) {
+        /*else if (id == R.id.nav_inspiration) {
             fragment = new Inspiration();
             title = getResources().getString(R.string.menu_inspiration);
         }/* else if (id == R.id.nav_slideshow) {
@@ -223,8 +226,8 @@ public class MainActivity extends AppCompatActivity
             mInterstitialAd.show();
     }
 
-    @Override
+    /*@Override
     public void onFragmentInteraction(Uri uri) {
 
-    }
+    }*/
 }
