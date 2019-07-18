@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/photilsDarkBackground"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tag_list_item_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textColor="@color/photilsText"
+        android:textSize="18sp" />
+
+    <com.adroitandroid.chipcloud.ChipCloud
+        android:id="@+id/tag_list_item_tag_cloud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:deselectedColor="@color/photilsDarkButton"
+        app:deselectedFontColor="#fefefe"
+        app:selectedColor="@color/photilsMidRed"
+        app:selectedFontColor="@color/photilsRed"
+        app:textSize="18sp" />
+
+</LinearLayout>

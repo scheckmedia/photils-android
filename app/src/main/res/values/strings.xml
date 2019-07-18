@@ -19,6 +19,10 @@
     <string name="menu_inspiration">Inspiration</string>
     <string name="main_action_info">About</string>
 
+    <plurals name="keyhwat_selected_tags">
+        <item quantity="one">%d tag selected</item>
+        <item quantity="other">%d tags selected</item>
+    </plurals>
     <string name="keywhat_action_custom_tags">About</string>
     <string name="keywhat_action_share">Share</string>
     <string name="keywhat_action_copy">Copy</string>
@@ -68,4 +72,7 @@
     <string name="custom_tags_dialog_add_error_message">The tag <b>%1$s</b> you entered already exist in group <b>%2$s</b></string>
     <string name="custom_tags_delete_title">Delete Tags?</string>
     <string name="custom_tags_delete_message">Are you sure you want to delete %1$d tags?</string>
+    <string name="nav_share_app">Recommend photils</string>
+    <string name="share_app_title">Check out photils</string>
+    <string name="share_app_message">Have you ever tried Photils? Photils is an app that generates automatic hash tags for your selected images. Try it out: https://play.google.com/store/apps/details?id=app.photils</string>
 </resources>

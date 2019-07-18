@@ -52,28 +52,27 @@
             android:layout_weight="0">
 
             <TextView
-                android:id="@+id/keywhat_lbl_tags"
+                android:id="@+id/keywhat_tv_selected_tags"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:paddingTop="5dp"
-                android:text="Tags"
-                android:textAlignment="viewStart"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical"
+                android:textAlignment="center"
                 android:textColor="@color/photilsText"
-                android:textSize="30sp"
-                android:textStyle="bold"
+                android:textSize="24sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/keywhat_cb_hashtag"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <CheckBox
                 android:id="@+id/keywhat_cb_hashtag"
                 android:layout_width="wrap_content"
-                android:layout_height="60dp"
+                android:layout_height="0dp"
                 android:buttonTint="@color/photilsText"
                 android:text="#"
                 android:textColor="@color/photilsText"
                 android:textSize="24sp"
-                android:visibility="invisible"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -86,36 +85,45 @@
             android:layout_height="match_parent"
             android:layout_weight="0.4">
 
-            <ScrollView
-                android:id="@+id/scrollView2"
+            <!--<ScrollView-->
+            <!--android:id="@+id/scrollView2"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="0dp"-->
+            <!--android:layout_margin="0dp"-->
+            <!--android:layout_marginStart="8dp"-->
+            <!--android:layout_marginTop="8dp"-->
+            <!--android:layout_marginEnd="8dp"-->
+            <!--android:fadeScrollbars="true"-->
+            <!--android:fadingEdge="horizontal"-->
+            <!--android:fadingEdgeLength="10dp"-->
+            <!--app:layout_constraintBottom_toTopOf="@+id/keywhat_progress"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintTop_toTopOf="parent">-->
+
+            <!--<com.adroitandroid.chipcloud.ChipCloud-->
+            <!--android:id="@+id/tag_list_item_tag_cloud"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:deselectedColor="@color/photilsDarkButton"-->
+            <!--app:deselectedFontColor="#fefefe"-->
+            <!--app:layout_constraintBottom_toBottomOf="parent"-->
+            <!--app:layout_constraintEnd_toEndOf="parent"-->
+            <!--app:layout_constraintStart_toStartOf="parent"-->
+            <!--app:layout_constraintTop_toTopOf="parent"-->
+            <!--app:selectedColor="@color/photilsMidRed"-->
+            <!--app:selectedFontColor="@color/photilsRed"-->
+            <!--app:textSize="18sp" />-->
+            <!--</ScrollView>-->
+            <ListView
+                android:id="@+id/keywhat_tag_list"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_margin="0dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:fadeScrollbars="true"
-                android:fadingEdge="horizontal"
-                android:fadingEdgeLength="10dp"
-                app:layout_constraintBottom_toTopOf="@+id/keywhat_progress"
+                android:animateLayoutChanges="true"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <com.adroitandroid.chipcloud.ChipCloud
-                    android:id="@+id/keywhat_tag_cloud"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:deselectedColor="@color/photilsDarkButton"
-                    app:deselectedFontColor="#fefefe"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:selectedColor="@color/photilsMidRed"
-                    app:selectedFontColor="@color/photilsRed"
-                    app:textSize="18sp" />
-            </ScrollView>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ProgressBar
                 android:id="@+id/keywhat_progress"
@@ -131,6 +139,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

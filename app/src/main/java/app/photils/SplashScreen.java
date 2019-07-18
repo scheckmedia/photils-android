@@ -14,7 +14,7 @@ public class SplashScreen extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        MobileAds.initialize(this, "ca-app-pub-4565424718929305~3838388374");
+        MobileAds.initialize(this, BuildConfig.ads_key);
 
         Intent intent = new Intent(getApplicationContext(),
                 MainActivity.class);

@@ -21,6 +21,7 @@
         android:backgroundTint="@color/photilsDarkButton"
         android:completionThreshold="1"
         android:hint="@string/custom_tags_dialog_group"
+        android:singleLine="true"
         android:textColor="@color/photilsText" />
 
     <EditText

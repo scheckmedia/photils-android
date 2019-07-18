@@ -52,11 +52,20 @@ public class Utils {
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
-    public static void shareImageIntent(Context ctx, Uri uri, String conent){
+    public static void shareImageIntent(Context ctx, Uri uri, String content){
         Intent share = new Intent(Intent.ACTION_SEND);
         share.setType("image/*");
-        share.putExtra(Intent.EXTRA_TEXT,conent);
+        share.putExtra(Intent.EXTRA_TEXT,content);
         share.putExtra(Intent.EXTRA_STREAM, uri);
+
+        ctx.startActivity(Intent.createChooser(share, "Share to"));
+    }
+
+    public static void shareContent(Context ctx, String title, String content) {
+        Intent share = new Intent(Intent.ACTION_SEND);
+        share.setType("text/plain");
+        share.putExtra(Intent.EXTRA_TEXT,content);
+        share.putExtra(Intent.EXTRA_SUBJECT, title);
 
         ctx.startActivity(Intent.createChooser(share, "Share to"));
     }

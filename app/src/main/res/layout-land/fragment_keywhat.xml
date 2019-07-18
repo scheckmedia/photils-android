@@ -59,7 +59,7 @@
                 android:layout_height="40dp">
 
                 <TextView
-                    android:id="@+id/keywhat_lbl_tags"
+                    android:id="@+id/keywhat_tv_selected_tags"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:text="Tags"
@@ -104,7 +104,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <com.adroitandroid.chipcloud.ChipCloud
-                        android:id="@+id/keywhat_tag_cloud"
+                        android:id="@+id/tag_list_item_tag_cloud"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:deselectedColor="@color/photilsDarkButton"

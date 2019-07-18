@@ -141,6 +141,7 @@ public class CustomTagListAdapter extends BaseExpandableListAdapter {
             );
             convertView = layoutInflater.inflate(R.layout.custom_tags_tag_item, null);
         }
+
         TextView expandedListTextView = convertView.findViewById(R.id.custom_tags_item_title);
         expandedListTextView.setText(tag.name);
 

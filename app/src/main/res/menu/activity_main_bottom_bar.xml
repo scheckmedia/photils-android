@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_keywhat"
-        android:icon="@drawable/ic_local_offer_black_24dp"
-        android:title="@string/menu_keywhat" />
-    <!--<item-->
-        <!--android:id="@+id/nav_inspiration"-->
-        <!--android:icon="@drawable/ic_image_black_24dp"-->
-        <!--android:title="@string/menu_inspiration" />-->
+    <group android:id="@+id/nav_section" android:checkableBehavior="all">
+        <item
+            android:id="@+id/nav_keywhat"
+            android:icon="@drawable/ic_local_offer_black_24dp"
+            android:title="@string/menu_keywhat" />
+
+        <item
+            android:id="@+id/nav_custom_tags"
+            android:icon="@drawable/ic_add_tag"
+            android:title="@string/title_activity_custom_tags" />
+
+        <!--<item-->
+            <!--android:id="@+id/nav_inspiration"-->
+            <!--android:icon="@drawable/ic_image_black_24dp"-->
+            <!--android:title="@string/menu_inspiration" />-->
+    </group>
+
+    <group android:id="@+id/util_section" android:checkableBehavior="all">
+        <item
+            android:id="@+id/nav_share_app"
+            android:icon="@drawable/ic_share_black_24dp"
+            android:title="@string/nav_share_app" />
+    </group>
 </menu>

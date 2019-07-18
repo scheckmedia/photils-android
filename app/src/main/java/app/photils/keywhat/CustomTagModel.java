@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class CustomTagModel {
+    public static int TAG_PER_GROUP_LIMIT = 1000;
     private CustomTagDatabase mDB;
     private CustomTagDao mDao;
 

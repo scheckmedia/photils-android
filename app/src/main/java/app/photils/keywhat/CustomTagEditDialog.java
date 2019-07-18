@@ -86,6 +86,11 @@ public class CustomTagEditDialog extends DialogFragment {
 
         tvGroup.setAdapter(adapter);
 
+        tvGroup.setOnTouchListener((v12, e) -> {
+            tvGroup.showDropDown();
+            return false;
+        });
+
 
         btnSave.setOnClickListener(v1 -> {
             dismiss();

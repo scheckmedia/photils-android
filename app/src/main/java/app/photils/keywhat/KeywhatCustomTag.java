@@ -1,6 +1,7 @@
 package app.photils.keywhat;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -22,6 +23,7 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
     ExpandableListView mListView;
     CustomTagListAdapter mListAdapter;
     Menu mMenu;
+    private boolean mIsDirty = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,7 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
         });
     }
 
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
@@ -78,19 +81,24 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
     public void onFragmentInteraction(CustomTag tag, boolean isUpdate) {
         CustomTag dbTag = mModel.getTag(tag.name);
 
+
+
         if(dbTag == null && tag.tid == 0) {
             mModel.add(tag);
+            mIsDirty = true;
         } else if(dbTag == null || tag.tid == dbTag.tid) {
             mModel.update(tag);
+            mIsDirty = true;
         } else {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.custom_tags_dialog_add_error_title))
                     .setMessage(getString(R.string.custom_tags_dialog_add_error_message, dbTag.name, dbTag.group))
                     .setPositiveButton(R.string.ok, null)
                     .show();
-
+            mIsDirty = false;
         }
         mListAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -125,9 +133,18 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void finish() {
+        final Intent intent = new Intent();
+        intent.putExtra("dirty", mIsDirty);
+        setResult(RESULT_OK, intent);
+        super.finish();
+    }
+
     private void delete() {
         mModel.removeAll(mListAdapter.getSelectedIds());
         mListAdapter.notifyDataSetChanged();
         mListAdapter.isSelectionMode(false);
+        mIsDirty = true;
     }
 }

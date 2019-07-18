@@ -23,7 +23,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 
 import app.photils.keywhat.KeywhatCustomTag;
-import app.photils.keywhat.KeywhatState;
+import app.photils.keywhat.KeywhatViewModel;
 
 
 public class MainActivity extends AppCompatActivity
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout mDrawer;
     private InterstitialAd mInterstitialAd;
     private int mCurrentMenu = R.id.nav_keywhat;
+    private static final int CUSTOM_TAG_CODE = 42;
 
 
     public Toolbar getToolbar() {
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity
 
         setContentView(R.layout.activity_main);
         mInterstitialAd = new InterstitialAd(this);
-        mInterstitialAd.setAdUnitId("ca-app-pub-4565424718929305/3632119213");
+        mInterstitialAd.setAdUnitId(BuildConfig.ads_key);
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
         mInterstitialAd.setAdListener(new AdListener() {
             @Override
@@ -81,9 +82,6 @@ public class MainActivity extends AppCompatActivity
             if(uri != null) {
                 f = Keywhat.newInstance(uri);
                 intent.setData(null);
-            } else if(savedInstanceState != null) {
-                KeywhatState state = savedInstanceState.getParcelable("fragmentState");
-                f = Keywhat.newInstance(state);
             }
 
             title = getResources().getString(R.string.menu_keywhat);
@@ -99,16 +97,6 @@ public class MainActivity extends AppCompatActivity
             } else {
                 changeFragment(R.id.nav_keywhat);
             }
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        Keywhat fragment = (Keywhat) getSupportFragmentManager().findFragmentByTag("Keywhat");
-        if(fragment != null && fragment.isVisible()) {
-            outState.putParcelable("fragmentState", fragment.getState());
         }
     }
 
@@ -136,18 +124,33 @@ public class MainActivity extends AppCompatActivity
             f.show(getSupportFragmentManager(), "InfoDialog");
         } else if(id == R.id.keywhat_action_custom_tags) {
             Intent i = new Intent(this, KeywhatCustomTag.class);
-            startActivity(i);
-
+            startActivityForResult(i, CUSTOM_TAG_CODE);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        return changeFragment(item.getItemId());
+
+        switch (item.getItemId()) {
+            case R.id.nav_keywhat:
+                return changeFragment(item.getItemId());
+            case R.id.nav_custom_tags:
+                Intent i = new Intent(this, KeywhatCustomTag.class);
+                startActivityForResult(i, CUSTOM_TAG_CODE);
+                break;
+            case R.id.nav_share_app:
+                Utils.shareContent(this, getString(R.string.share_app_title), getString(R.string.share_app_message));
+                break;
+
+        }
+
+        return true;
     }
 
     @Override
@@ -195,6 +198,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == CUSTOM_TAG_CODE) {
+            if(resultCode == RESULT_OK && data != null) {
+                boolean isDirty = data.getBooleanExtra("dirty", false);
+                Keywhat k = (Keywhat)getSupportFragmentManager().findFragmentByTag("Keywhat");
+                if(k != null && isDirty) {
+                    k.notifyChange();
+                }
+            }
+        }
     }
 
     @Override
