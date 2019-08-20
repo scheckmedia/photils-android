@@ -34,14 +34,38 @@ public class KeywhatAdapter extends BaseAdapter{
         void onTagDeselected(int tagid);
     }
 
-    class ViewHolder {
+    class ViewHolder implements ChipListener {
+        KeywhatAdapterListener keywhatListener;
         TextView group;
         ChipCloud cloud;
-        ChipListener listener;
+        int position;
 
-        public ViewHolder(@NotNull View v) {
-            group = v.findViewById(R.id.tag_list_item_title);
-            cloud = v.findViewById(R.id.tag_list_item_tag_cloud);
+        public ViewHolder(TextView group, ChipCloud cloud, KeywhatAdapterListener listener) {
+            this.group = group;
+            this.cloud = cloud;
+            mListener = listener;
+
+            cloud.setChipListener(this);
+        }
+
+        @Override
+        public void chipSelected(int index) {
+            if(mListener != null)
+                mListener.onTagSelected(position * CustomTagModel.TAG_PER_GROUP_LIMIT + index);
+        }
+
+        @Override
+        public void chipDeselected(int index) {
+            if(mListener != null)
+                mListener.onTagDeselected(position * CustomTagModel.TAG_PER_GROUP_LIMIT + index);
+        }
+
+        public void pauseListening(boolean pause) {
+            if(pause) {
+                cloud.setChipListener(null);
+            } else {
+                cloud.setChipListener(this);
+            }
         }
     }
 
@@ -84,31 +108,21 @@ public class KeywhatAdapter extends BaseAdapter{
             );
             convertView = layoutInflater.inflate(R.layout.keywhat_tag_list_item, null);
 
-            holder = new ViewHolder(convertView);
+            TextView tv = convertView.findViewById(R.id.tag_list_item_title);
+            ChipCloud cloud = convertView.findViewById(R.id.tag_list_item_tag_cloud);
+
+            holder = new ViewHolder(tv, cloud, mListener);
             convertView.setTag(holder);
+
         } else {
             holder = (ViewHolder)convertView.getTag();
         }
 
         holder.group.setText(groupItem);
-        if(holder.listener == null) {
-            holder.listener = new ChipListener() {
-                @Override
-                public void chipSelected(int i) {
-                    if(mListener != null)
-                        mListener.onTagSelected(position * CustomTagModel.TAG_PER_GROUP_LIMIT + i);
-                }
-
-                @Override
-                public void chipDeselected(int i) {
-                    if(mListener != null)
-                        mListener.onTagDeselected(position * CustomTagModel.TAG_PER_GROUP_LIMIT + i);
-                }
-            };
-        }
+        holder.position = position;
 
         holder.cloud.removeAllViews();
-        holder.cloud.setChipListener(null);
+        holder.pauseListening(true);
         if(mTags.containsKey(groupid) && mTags.get(groupid).size() > 0 ) {
             for(KeywhatTag tag : mTags.get(groupid)) {
                 holder.cloud.addChip((mAliasEnabled ? "#" : "") + tag.getName());
@@ -123,9 +137,7 @@ public class KeywhatAdapter extends BaseAdapter{
             holder.group.setVisibility(View.GONE);
         }
 
-        holder.cloud.setChipListener(holder.listener);
-
-
+        holder.pauseListening(false);
         Log.v(BuildConfig.APPLICATION_ID, "Tags: " + mTags.size());
 
         return convertView;
