@@ -75,4 +75,5 @@
     <string name="nav_share_app">Recommend photils</string>
     <string name="share_app_title">Check out photils</string>
     <string name="share_app_message">Have you ever tried photils? Photils is an app that generates hashtags, using machine learning, for your selected images. Try it: https://play.google.com/store/apps/details?id=app.photils</string>
+    <string name="nav_buy_me_beer">Buy me a Beer!</string>
 </resources>

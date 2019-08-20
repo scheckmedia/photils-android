@@ -28,9 +28,9 @@ import app.photils.keywhat.KeywhatViewModel;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        Keywhat.OnKeywhatListener/*,
-        Inspiration.OnInspirationListener*/ {
+        Keywhat.OnKeywhatListener {
 
+    private static String BEER = "https://www.paypal.com/paypalme2/uncloned/2";
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private InterstitialAd mInterstitialAd;
@@ -146,6 +146,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_share_app:
                 Utils.shareContent(this, getString(R.string.share_app_title), getString(R.string.share_app_message));
+                break;
+            case R.id.nav_buy_beer:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BEER)));
                 break;
 
         }

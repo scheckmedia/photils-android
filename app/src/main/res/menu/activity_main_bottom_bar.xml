@@ -22,5 +22,9 @@
             android:id="@+id/nav_share_app"
             android:icon="@drawable/ic_share_black_24dp"
             android:title="@string/nav_share_app" />
+        <item
+            android:id="@+id/nav_buy_beer"
+            android:icon="@drawable/ic_beer"
+            android:title="@string/nav_buy_me_beer" />
     </group>
 </menu>
