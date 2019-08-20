@@ -11,10 +11,6 @@ import android.os.Build;
 import android.util.Log;
 import android.util.Size;
 
-import org.rajawali3d.Object3D;
-import org.rajawali3d.math.MathUtil;
-import org.rajawali3d.math.vector.Vector3;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -79,29 +75,6 @@ public class Utils {
         return scaledBitmap;
     }
 
-    public static Vector3 latLonToXYZ(double lat, double lon){
-        final double r = 6371; // km
-        lat = MathUtil.degreesToRadians(lat);
-        lon = MathUtil.degreesToRadians(lon);
-
-        final double x = r * Math.cos(lat) * Math.cos(lon);
-        final double y = r * Math.cos(lat) * Math.sin(lon);
-        final double z = r * Math.sin(lat);
-
-        return new Vector3(x,z,y);
-    }
-
-    public static double angleBetweenLocations(double lat1, double lon1, double lat2, double lon2) {
-        final double dLon = (lon2 - lon1);
-        final double y = Math.sin(dLon) * Math.cos(lat2);
-        final double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
-                * Math.cos(lat2) * Math.cos(dLon);
-        double bearing = Math.atan2(y, x);
-        bearing = MathUtil.radiansToDegrees(bearing);
-        bearing = (bearing + 360) % 360;
-        bearing = 360 - bearing;
-        return bearing;
-    }
 
     /**
      * https://github.com/googlesamples/android-Camera2Basic/blob/master/Application/src/main/java/com/example/android/camera2basic/Camera2BasicFragment.java
@@ -168,31 +141,6 @@ public class Utils {
 
     }
 
-    public static void fitTextureToAspect(Object3D obj, float aspect) {
-        if(aspect == 1.0)
-            return;
-
-        float d = aspect / 2.0f;
-        FloatBuffer buffer = obj.getGeometry().getTextureCoords();
-
-        if (aspect < 1) {
-            buffer.put(0, d);
-            buffer.put(2, d);
-            buffer.put(4, 1 - d);
-            buffer.put(6, 1 - d);
-        } else {
-            buffer.put(1, d);
-            buffer.put(3, 1 - d);
-            buffer.put(5, d);
-            buffer.put(7, 1 - d);
-        }
-
-
-        obj.getGeometry().changeBufferData(
-                obj.getGeometry().getTexCoordBufferInfo(),
-                buffer, 0, buffer.limit()
-        );
-    }
 }
 
 // https://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-times-out?answertab=votes#tab-top
