@@ -24,12 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.photils.R;
+import app.photils.Utils;
 
 public class PhotilsApi {
 
     protected Interpreter mInterpreter;
 
+    // final static String URL = "https://192.168.178.20:11000/";
     final static String URL = "https://api.photils.app/";
+    final static int FEATURE_DIM = 128;
 
     private static PhotilsApi mInstance;
     private RequestQueue mRequestQueue;
@@ -59,10 +62,11 @@ public class PhotilsApi {
         }
 
 
-        float[][] result = new float[1][256];
+        float[][] result = new float[1][FEATURE_DIM];
         mInterpreter.run(img ,result);
+        result = Utils.l2_normalize(result);
 
-        ByteBuffer buffer = ByteBuffer.allocate(4 * 256);
+        ByteBuffer buffer = ByteBuffer.allocate(4 * FEATURE_DIM);
         buffer.order(ByteOrder.nativeOrder());
         buffer.asFloatBuffer().put(result[0]);
 

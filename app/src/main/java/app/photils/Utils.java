@@ -24,7 +24,7 @@ import java.util.List;
 
 public class Utils {
     public static ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap, int inputSize) {
-        bitmap = Bitmap.createScaledBitmap(bitmap, inputSize, inputSize,true);
+        bitmap = Bitmap.createScaledBitmap(bitmap, inputSize, inputSize,false);
         ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * inputSize * inputSize * 3);
 
         byteBuffer.order(ByteOrder.nativeOrder());
@@ -34,12 +34,32 @@ public class Utils {
         for (int i = 0; i < inputSize; ++i) {
             for (int j = 0; j < inputSize; ++j) {
                 final int val = intValues[pixel++];
-                byteBuffer.putFloat(((val) & 0xFF) - 103.939f);
-                byteBuffer.putFloat(((val >> 8) & 0xFF) - 116.779f);
-                byteBuffer.putFloat(((val >> 16) & 0xFF) - 123.68f);
+                byteBuffer.putFloat(((val) & 0xFF) / 127.5f - 1.0f);
+                byteBuffer.putFloat(((val >> 8) & 0xFF) / 127.5f - 1.0f);
+                byteBuffer.putFloat(((val >> 16) & 0xFF) / 127.5f - 1.0f);
             }
         }
         return byteBuffer;
+    }
+
+    public static float[][] l2_normalize(float[][] data) {
+        float[][] out = new float[data.length][data[0].length];
+        double epsilon = 1e-12;
+        for(int i = 0; i < data.length; i++) {
+            double sum = 0.0f;
+            for(int j = 0; j < data[i].length; j++) {
+                sum += data[i][j] * data[i][j];
+            }
+
+            float length = (float)Math.sqrt(Math.max(sum, epsilon));
+            for(int j = 0; j < data[i].length; j++) {
+                sum += data[i][j] * data[i][j];
+                out[i][j] = data[i][j] / length;
+            }
+
+        }
+
+        return out;
     }
 
     public static Bitmap rotateBitmap(Bitmap bitmap, int degrees) {

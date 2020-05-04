@@ -62,7 +62,7 @@ import app.photils.keywhat.KeywhatViewModel;
  */
 public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterListener {
     final static int PERMISSION_READ = 0;
-    final static int mInputSize = 256;
+    final static int mInputSize = 224;
 
     private int IMAGE_SELECTION_RESULT = 1;
     private View mOverlay;
