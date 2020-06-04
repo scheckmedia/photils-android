@@ -14,6 +14,8 @@ import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.ExpandableListView;
 
+import java.util.ArrayList;
+
 import app.photils.R;
 
 public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEditDialog.OnTagSave,
@@ -78,27 +80,35 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
     }
 
     @Override
-    public void onFragmentInteraction(CustomTag tag, boolean isUpdate) {
-        CustomTag dbTag = mModel.getTag(tag.name);
+    public void onFragmentInteraction(ArrayList<CustomTag> tags, boolean isUpdate) {
+        ArrayList<CustomTag> skip = new ArrayList<>();
+        for(CustomTag tag : tags) {
+            CustomTag dbTag = mModel.getTag(tag.name);
 
+            if(dbTag == null && tag.tid == 0) {
+                mModel.add(tag);
+                mIsDirty = true;
+            } else if(dbTag == null || tag.tid == dbTag.tid) {
+                mModel.update(tag);
+                mIsDirty = true;
+            } else {
+                skip.add(dbTag);
+            }
+        }
 
+        if (skip.size() > 0) {
+            String msg = "";
+            for(CustomTag tag : skip) {
+                msg += getString(R.string.custom_tags_dialog_error_tag_group,tag.name, tag.group);
+                msg += "\n";
+            }
 
-        if(dbTag == null && tag.tid == 0) {
-            mModel.add(tag);
-            mIsDirty = true;
-        } else if(dbTag == null || tag.tid == dbTag.tid) {
-            mModel.update(tag);
-            mIsDirty = true;
-        } else {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.custom_tags_dialog_add_error_title))
-                    .setMessage(getString(R.string.custom_tags_dialog_add_error_message, dbTag.name, dbTag.group))
+                    .setMessage(msg)
                     .setPositiveButton(R.string.ok, null)
                     .show();
-            mIsDirty = false;
         }
-        mListAdapter.notifyDataSetChanged();
-
     }
 
     @Override

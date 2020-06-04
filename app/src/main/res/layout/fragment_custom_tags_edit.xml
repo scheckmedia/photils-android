@@ -14,10 +14,12 @@
 
     <AutoCompleteTextView
         android:id="@+id/tb_custom_tags_group"
+        style="@style/Autocomplete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:layout_weight="1"
+        android:dropDownHeight="200dp"
         android:backgroundTint="@color/photilsDarkButton"
         android:completionThreshold="1"
         android:hint="@string/custom_tags_dialog_group"
@@ -58,7 +60,7 @@
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:backgroundTint="@color/photilsDarkRed"
-            android:text="@android:string/cancel"
+            android:text="@string/cancel"
             app:icon="@android:drawable/ic_menu_close_clear_cancel"
             app:iconGravity="textStart" />
 

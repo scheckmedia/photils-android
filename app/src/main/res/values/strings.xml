@@ -52,7 +52,7 @@
         <![CDATA[
         <h1>Keywhat</h1>
         <p>
-            Take a picture and let <i>Keywhat</i> suggest many hashtags for your image. For every image a neural network is calculating features to extract informations of your image locally. After this, the calculated feature will be sent to our backend for a keyword lookup. The size of this feature will be ~1.3 kB.
+            Take a picture and let <i>Keywhat</i> suggest many hashtags for your image. For every image a neural network is calculating features to extract informations of your image locally. After this, the calculated feature will be sent to our backend for a keyword lookup. The size of this feature will be ~0.5 kB.
         </p>
         <p>
             <b>It should be noted that no recognizable image data leave your phone! </b>
@@ -65,11 +65,12 @@
     </string>
     <string name="title_activity_custom_tags">Custom Tags</string>
     <string name="custom_tags_no_item_message">There are no custom tags yet.</string>
-    <string name="custom_tags_dialog_group">Group of Tag e.g. Landscape</string>
-    <string name="custom_tags_dialog_tag">Tag (without #)</string>
+    <string name="custom_tags_dialog_group">Add/Select group name for tags e.g. Landscape</string>
+    <string name="custom_tags_dialog_tag">Tag (without #, separated by space for multiple)</string>
     <string name="custom_tags_dialog_default">Selected by Default</string>
     <string name="custom_tags_dialog_add_error_title">Tag already exists</string>
-    <string name="custom_tags_dialog_add_error_message">The tag <b>%1$s</b> you entered already exist in group <b>%2$s</b></string>
+    <string name="custom_tags_dialog_add_error_message">The following tags already exists:\n%1$s</string>
+    <string name="custom_tags_dialog_error_tag_group">Custom Tag: <i>%1$s</i> in Group: <i>%2$s</i></string>
     <string name="custom_tags_delete_title">Delete Tags?</string>
     <string name="custom_tags_delete_message">Are you sure you want to delete %1$d tags?</string>
     <string name="nav_share_app">Recommend photils</string>

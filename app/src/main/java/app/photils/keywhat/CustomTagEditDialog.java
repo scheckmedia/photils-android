@@ -80,7 +80,7 @@ public class CustomTagEditDialog extends DialogFragment {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 getContext(),
-                android.R.layout.simple_dropdown_item_1line,
+                R.layout.autocomplete_custom,
                 groups
         );
 
@@ -94,19 +94,24 @@ public class CustomTagEditDialog extends DialogFragment {
 
         btnSave.setOnClickListener(v1 -> {
             dismiss();
+            ArrayList<CustomTag> tags = new ArrayList<>();
             if(mListener == null)
                 return;
+            for (String t : tvTag.getText().toString().split("\\s+"))
+            {
+                CustomTag tag = mSelectedTag;
+                if(tag == null) {
+                    tag = new CustomTag(t,tvGroup.getText().toString(), cb.isChecked());
+                } else {
+                    tag.isDefault = cb.isChecked();
+                    tag.name = tvTag.getText().toString();
+                    tag.group = tvGroup.getText().toString();
+                }
 
-            CustomTag tag = mSelectedTag;
-            if(tag == null) {
-                tag = new CustomTag(tvTag.getText().toString(),tvGroup.getText().toString(), cb.isChecked());
-            } else {
-                tag.isDefault = cb.isChecked();
-                tag.name = tvTag.getText().toString();
-                tag.group = tvGroup.getText().toString();
+                tags.add(tag);
             }
 
-            mListener.onFragmentInteraction(tag, mSelectedTag != null);
+            mListener.onFragmentInteraction(tags, mSelectedTag != null);
 
         });
 
@@ -117,6 +122,6 @@ public class CustomTagEditDialog extends DialogFragment {
 
     public interface OnTagSave {
         // TODO: Update argument type and name
-        void onFragmentInteraction(CustomTag tag, boolean isUpdate);
+        void onFragmentInteraction(ArrayList<CustomTag> tags, boolean isUpdate);
     }
 }

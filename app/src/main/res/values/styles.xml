@@ -36,5 +36,9 @@
         <item name="fontFamily">@font/rounded_elegance</item>
     </style>
 
+    <style name="Autocomplete">
+        <item name="colorControlNormal">@color/colorPrimaryDark</item>
+        <item name="colorControlActivated">@color/photilsText</item>
+    </style>
 
 </resources>
