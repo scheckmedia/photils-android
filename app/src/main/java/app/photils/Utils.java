@@ -30,8 +30,8 @@ public class Utils {
     public static ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap, int inputSize) {
 
         double scale = inputSize / (double)(Math.min(bitmap.getWidth(), bitmap.getHeight()));
-        double nw = Math.floor(scale * bitmap.getWidth());
-        double nh = Math.floor(scale * bitmap.getHeight());
+        double nw = Math.round(scale * bitmap.getWidth());
+        double nh = Math.round(scale * bitmap.getHeight());
         double half = inputSize / 2.0;
         double cx = nw / 2.0;
         double cy = nh / 2.0;
