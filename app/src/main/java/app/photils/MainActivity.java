@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity
         Keywhat.OnKeywhatListener {
 
     private static String BEER = "https://www.paypal.com/paypalme2/uncloned/2";
+    private static String WEBSITE = "https://photils.app";
     private Toolbar mToolbar;
     private DrawerLayout mDrawer;
     private InterstitialAd mInterstitialAd;
@@ -150,6 +151,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_buy_beer:
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(BEER)));
+                break;
+            case R.id.nav_further_info:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(WEBSITE)));
                 break;
 
         }

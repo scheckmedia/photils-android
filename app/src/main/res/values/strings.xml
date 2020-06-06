@@ -41,7 +41,9 @@
         <![CDATA[
         <h1>Permission Required</h1>
         <p>
-            <i>Keywhat</i> requires permissions to read your local storage. Without this permission <i>Keywhat</i> is not able to open your image and without an image it is not possible to suggest keywords. Until the permission is denied this feature can not be used.
+            <i>Keywhat</i> requires permissions to read your local storage.
+            Without this permission <i>Keywhat</i> is not able to open your image and without an image it is not possible to suggest keywords.
+            Until the permission is denied this feature can not be used.
         </p>
         ]]>
     </string>
@@ -49,7 +51,9 @@
         <![CDATA[
         <h1>Permission Required</h1>
         <p>
-            <i>Inspiration</i> requires permissions to read your local storage. Without this permission <i>Keywhat</i> is not able to open your image and without an image it is not possible to suggest keywords. Until the permission is denied this feature can not be used.
+            <i>Inspiration</i> requires permissions to read your local storage.
+            Without this permission <i>Keywhat</i> is not able to open your image and without an image it is not possible to suggest keywords.
+            Until the permission is denied this feature can not be used.
         </p>
         ]]>
     </string>
@@ -58,14 +62,28 @@
         <![CDATA[
         <h1>Keywhat</h1>
         <p>
-            Take a picture and let <i>Keywhat</i> suggest many hashtags for your image. For every image a neural network is calculating features to extract informations of your image locally. After this, the calculated feature will be sent to our backend for a keyword lookup. The size of this feature will be ~0.5 kB.
+            Take a picture and let <i>Keywhat</i> suggest many hashtags for your image.
+            For every image a neural network is used to classify your image and find meaningful keywords.
         </p>
         <p>
-            <b>It should be noted that no recognizable image data leave your phone! </b>
+            <b><i>
+                It should be noted that everything is processed on your mobile device.
+                No images, no data related to this request leave your phone!
+            </i></b>
         </p>
 
         <p>
-            After processing your selected image you are able to select multiple hashtags from a list of suggestions. If you select at least one hashtag you have the opportunity to share your image with the selected tags. If an external app like WhatsApp support it, the selected tags will be used as image description. Unfortunately there exists no function like this for <b>Instagram</b>. Because of this, after you share the image with Instagram, the selected hashtags are copied to your clipboard. At the point when Instagram ask you for the image description you are able to paste the selected keywords from your clipboard.
+            After processing your selected image you are able to select multiple hashtags from a list of suggestions.
+            If you select at least one hashtag you have the opportunity to share your image with the selected tags.
+            If an external app like WhatsApp support it, the selected tags will be used as image description.
+            Unfortunately there exists no function like this for <b>Instagram</b>.
+            Because of this, after you share the image with Instagram, the selected hashtags are copied to your clipboard.
+            At the point when Instagram ask you for the image description you are able to paste the selected keywords from your clipboard.
+        </p>
+
+        <p>
+            Photils is free and Open Source, you can check the source code or contribute.
+            Have a look at <a href="https://photils.app">https://photils.app</a> for further information.
         </p>
         ]]>
     </string>
@@ -83,4 +101,5 @@
     <string name="share_app_title">Check out photils</string>
     <string name="share_app_message">Have you ever tried photils? Photils is an app that generates hashtags, using machine learning, for your selected images. Try it: https://play.google.com/store/apps/details?id=app.photils</string>
     <string name="nav_buy_me_beer">Buy me a Beer!</string>
+    <string name="nav_further_info">Further Information</string>
 </resources>

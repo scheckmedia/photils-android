@@ -11,6 +11,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import app.photils.R;
@@ -24,7 +25,7 @@ public class CustomTagListAdapter extends BaseExpandableListAdapter {
     private boolean isSelectionMode;
     private OnItemSelectionChange mListener;
 
-    private ArrayList<CustomTag> mSelectedTags = new ArrayList<>();
+    private HashSet<CustomTag> mSelectedTags = new HashSet<>();
 
     public CustomTagListAdapter(CustomTagModel model, Context ctx) {
         mModel = model;
@@ -150,6 +151,8 @@ public class CustomTagListAdapter extends BaseExpandableListAdapter {
 
         CheckBox cb = convertView.findViewById(R.id.custom_tags_cb);
         cb.setVisibility(isSelectionMode ? View.VISIBLE : View.INVISIBLE);
+        cb.setOnCheckedChangeListener(null);
+        cb.setChecked(mSelectedTags.contains(tag));
         cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(isChecked) {
                 mSelectedTags.add(tag);
@@ -160,6 +163,8 @@ public class CustomTagListAdapter extends BaseExpandableListAdapter {
             if(mListener != null) mListener.onItemSelectionChange(tag, isChecked);
         });
 
+
+        //System.out.println("blaa" + mSelectedTags.contains(tag));
 
 
         return convertView;

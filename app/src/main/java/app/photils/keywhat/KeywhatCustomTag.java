@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ExpandableListView;
 
@@ -24,6 +25,7 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
     CustomTagModel mModel;
     ExpandableListView mListView;
     CustomTagListAdapter mListAdapter;
+    FloatingActionButton mBtnAdd;
     Menu mMenu;
     private boolean mIsDirty = false;
 
@@ -36,6 +38,7 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        mBtnAdd = findViewById(R.id.fab);
         mModel = new CustomTagModel(getApplication());
         mListAdapter = new CustomTagListAdapter(mModel, this);
         mListAdapter.setListener(this);
@@ -58,13 +61,14 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
 
         mListView.setOnItemLongClickListener((parent, view, position, id) -> {
             mListAdapter.isSelectionMode(true);
+            mBtnAdd.setVisibility(View.INVISIBLE);
             CheckBox cb = view.findViewById(R.id.custom_tags_cb);
             if(cb != null) cb.setChecked(true);
             return true;
         });
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
+
+        mBtnAdd.setOnClickListener(view -> {
             CustomTagEditDialog f = CustomTagEditDialog.newInstance(null);
             f.setListener(this);
             f.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.InfoDialog);
@@ -96,6 +100,8 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
             }
         }
 
+        mListAdapter.notifyDataSetChanged();
+
         if (skip.size() > 0) {
             String msg = "";
             for(CustomTag tag : skip) {
@@ -125,7 +131,10 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
             mMenu.getItem(0).setVisible(mListAdapter.getSelectedItemsCount() > 0);
         }
 
-        if(mListAdapter.getSelectedItemsCount() == 0) mListAdapter.isSelectionMode(false);
+        if(mListAdapter.getSelectedItemsCount() == 0) {
+            mListAdapter.isSelectionMode(false);
+            mBtnAdd.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -155,6 +164,7 @@ public class KeywhatCustomTag extends AppCompatActivity implements CustomTagEdit
         mModel.removeAll(mListAdapter.getSelectedIds());
         mListAdapter.notifyDataSetChanged();
         mListAdapter.isSelectionMode(false);
+        mBtnAdd.setVisibility(View.VISIBLE);
         mIsDirty = true;
     }
 }

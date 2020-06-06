@@ -48,7 +48,7 @@ public class CustomTag implements Parcelable {
         }
 
         CustomTag tag = (CustomTag)o;
-        return true;
+        return tag.tid == this.tid;
     }
 
     public static final Creator<CustomTag> CREATOR = new Creator<CustomTag>() {
@@ -74,6 +74,11 @@ public class CustomTag implements Parcelable {
         dest.writeString(name);
         dest.writeString(group);
         dest.writeByte((byte) (isDefault ? 1 : 0));
+    }
+
+    @Override
+    public int hashCode() {
+        return tid;
     }
 }
 

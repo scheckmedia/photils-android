@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.core.content.FileProvider;
 import androidx.core.text.HtmlCompat;
@@ -78,7 +79,7 @@ public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterLi
     private PhotilsApi mApi;
     private ListView mTagList;
     private KeywhatAdapter mAdapter;
-
+    private ConstraintLayout mKeywhatFilterRow;
     private TextView mTvSelectedTags;
 
     private OnKeywhatListener mKeyhwatListener;
@@ -251,6 +252,7 @@ public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterLi
         mTagList.setAdapter(mAdapter);
 
         mTvSelectedTags = v.findViewById(R.id.keywhat_tv_selected_tags);
+        mKeywhatFilterRow = v.findViewById(R.id.keywhat_filter);
 
         mImageView.setOnClickListener(v1 -> {
             Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -338,8 +340,7 @@ public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterLi
             mTvSelectedTags.setText("");
         } else {
             mTvSelectedTags.setText(getResources().getQuantityString(
-                    R.plurals.keyhwat_selected_tags, num, num)
-            );
+                    R.plurals.keyhwat_selected_tags, num, num));
         }
 
         Log.v(BuildConfig.APPLICATION_ID, "Tag counter " + num);
@@ -435,6 +436,7 @@ public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterLi
                 mCurrentPredictions = tagList;
                 getActivity().runOnUiThread(() -> {
                     mKeywhatModel.clearSelectedTags();
+                    mKeywhatFilterRow.setVisibility(View.VISIBLE);
                     filterTags();
                     toggleProgress(false);
                     toggleMenuItems();

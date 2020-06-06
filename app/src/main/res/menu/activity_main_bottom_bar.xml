@@ -26,5 +26,9 @@
             android:id="@+id/nav_buy_beer"
             android:icon="@drawable/ic_beer"
             android:title="@string/nav_buy_me_beer" />
+        <item
+            android:id="@+id/nav_further_info"
+            android:icon="@drawable/ic_info_outline_black_24dp"
+            android:title="@string/nav_further_info" />
     </group>
 </menu>
