@@ -16,6 +16,7 @@
         tools:context=".Keywhat">
 
         <!-- TODO: Update blank fragment layout -->
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/keywhat_upload_container"
             android:layout_width="match_parent"
@@ -45,11 +46,64 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/keywhat_tags_label"
+            android:id="@+id/keywhat_filter"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="20dp"
             android:layout_weight="0">
+
+            <TextView
+                android:id="@+id/keywhat_tv_confidence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/keywhat_confidence"
+                android:textColor="@color/photilsText"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <SeekBar
+                android:id="@+id/keywhat_confidence_slider"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:max="100"
+                android:min="10"
+                android:progress="90"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/keywhat_tv_current_confidence"
+                app:layout_constraintStart_toEndOf="@+id/keywhat_tv_confidence"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/keywhat_tv_current_confidence"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/keywhat_current_confidence"
+                android:textColor="@color/photilsText"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/keywhat_confidence_slider"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/keywhat_tags_label"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="0dp"
+            android:layout_weight="0">
+
+            <TextView
+                android:id="@+id/keywhat_tv_num_tags"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/photilsText"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/keywhat_tv_selected_tags"
@@ -115,6 +169,7 @@
             <!--app:selectedFontColor="@color/photilsRed"-->
             <!--app:textSize="18sp" />-->
             <!--</ScrollView>-->
+
             <ListView
                 android:id="@+id/keywhat_tag_list"
                 android:layout_width="0dp"
@@ -123,7 +178,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent" >
+
+            </ListView>
 
             <ProgressBar
                 android:id="@+id/keywhat_progress"

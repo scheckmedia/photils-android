@@ -2,6 +2,7 @@ package app.photils.api;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.Resources;
 import android.util.Base64;
 
 import com.android.volley.Request;
@@ -16,11 +17,13 @@ import org.tensorflow.lite.Interpreter;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import app.photils.R;
@@ -29,23 +32,32 @@ import app.photils.Utils;
 public class PhotilsApi {
 
     protected Interpreter mInterpreter;
-
-    // final static String URL = "https://192.168.178.20:11000/";
-    final static String URL = "https://api.photils.app/";
-    final static int FEATURE_DIM = 128;
-
     private static PhotilsApi mInstance;
-    private RequestQueue mRequestQueue;
     private Context mContext;
+    private JSONArray mLabels;
 
     private PhotilsApi(Context ctx) {
         this.mContext = ctx;
-        mRequestQueue = Volley.newRequestQueue(ctx);
-        mRequestQueue.start();
 
         try {
             mInterpreter = new Interpreter(loadModel());
-        } catch (Exception ex) {}
+            loadLabels();
+        } catch (Exception ex) {
+
+        }
+    }
+
+    private void loadLabels() throws IOException {
+        try(InputStream is = mContext.getResources().openRawResource(R.raw.labels)) {
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            mLabels = new JSONArray( new String(buffer, "UTF-8"));
+        } catch(IOException | JSONException | Resources.NotFoundException ex) {
+
+        }
+
+
     }
 
     public static synchronized PhotilsApi getInstance(Context ctx) {
@@ -61,50 +73,21 @@ public class PhotilsApi {
             return;
         }
 
-
-        float[][] result = new float[1][FEATURE_DIM];
+        float[][] result = new float[1][mLabels.length()];
         mInterpreter.run(img ,result);
-        result = Utils.l2_normalize(result);
 
-        ByteBuffer buffer = ByteBuffer.allocate(4 * FEATURE_DIM);
-        buffer.order(ByteOrder.nativeOrder());
-        buffer.asFloatBuffer().put(result[0]);
-
-
-        String content = Base64.encodeToString(buffer.array(), Base64.DEFAULT);
-        JSONObject data;
+        ArrayList<Prediction> predictions = new ArrayList<>();
 
         try {
-            data = new JSONObject();
-            data.put("feature", content);
-        } catch (JSONException e) {
+            for(int i = 0; i < result[0].length; i++) {
+                predictions.add(new Prediction(result[0][i], mLabels.getString(i), i));
+            }
+        } catch (Exception e) {
             callback.onFail(new ApiException(e.getMessage(), e.getCause()));
-            return;
         }
 
-
-        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, URL + "tags", data,
-                response -> {
-                    try {
-                        if (response.getString("success") == "true"
-                                && response.has("tags")) {
-                            List tagList = new ArrayList();
-                            JSONArray tags = response.getJSONArray("tags");
-                            for(int i = 0; i < tags.length(); i++) {
-                                tagList.add(tags.getString(i));
-                            }
-
-                            callback.onSuccess(tagList);
-                        }
-                    } catch (JSONException e) {
-                        callback.onFail(new ApiException(e.getMessage(), e.getCause()));
-                    }
-
-                }, error -> {
-            callback.onFail(new ApiException(error.getMessage(), error.getCause()));
-        });
-
-        mRequestQueue.add(req);
+        Collections.sort(predictions, Collections.reverseOrder());
+        callback.onSuccess(predictions);
     }
 
 
@@ -119,8 +102,6 @@ public class PhotilsApi {
     }
 
     private MappedByteBuffer loadModel() throws IOException {
-        //AssetManager mgr = mContext.getApplicationContext().getAssets();
-        //AssetFileDescriptor fd = mgr.openFd(MODEL_PATH);
         AssetFileDescriptor fd = mContext.getResources().openRawResourceFd(R.raw.model);
         FileInputStream fis = new FileInputStream(fd.getFileDescriptor());
         FileChannel channel = fis.getChannel();
@@ -130,7 +111,39 @@ public class PhotilsApi {
     }
 
     public interface OnTagsReceived {
-        void onSuccess(List<String> tags);
+        void onSuccess(List<Prediction> tags);
         void onFail(ApiException ex);
+    }
+
+    public class Prediction implements Comparable<Prediction> {
+        float mConfidence;
+        String mLabel;
+        int mLabelId;
+
+        public Prediction(float confidence, String label, int tid) {
+            this.mConfidence = confidence;
+            this.mLabel = label;
+            this.mLabelId = tid;
+        }
+
+        public float getConfidence() {
+            return mConfidence;
+        }
+
+        public String getLabel() {
+            return mLabel;
+        }
+
+        public int getLabelId() {
+            return this.mLabelId;
+        }
+
+
+        @Override
+        public int compareTo(Prediction o) {
+            if(mConfidence == o.getConfidence())
+                return 0;
+            return mConfidence < o.getConfidence() ? -1 : 1;
+        }
     }
 }

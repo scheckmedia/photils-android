@@ -1,5 +1,7 @@
 package app.photils;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,6 +13,8 @@ import android.os.Build;
 import android.util.Log;
 import android.util.Size;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -24,21 +28,31 @@ import java.util.List;
 
 public class Utils {
     public static ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap, int inputSize) {
-        bitmap = Bitmap.createScaledBitmap(bitmap, inputSize, inputSize,false);
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * inputSize * inputSize * 3);
 
-        byteBuffer.order(ByteOrder.nativeOrder());
+        double scale = inputSize / (double)(Math.min(bitmap.getWidth(), bitmap.getHeight()));
+        double nw = Math.floor(scale * bitmap.getWidth());
+        double nh = Math.floor(scale * bitmap.getHeight());
+        double half = inputSize / 2.0;
+        double cx = nw / 2.0;
+        double cy = nh / 2.0;
+        int startx = (int)(cx - half);
+        int starty = (int)(cy - half);
+
         int[] intValues = new int[inputSize * inputSize];
-        bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
-        int pixel = 0;
-        for (int i = 0; i < inputSize; ++i) {
-            for (int j = 0; j < inputSize; ++j) {
-                final int val = intValues[pixel++];
-                byteBuffer.putFloat(((val) & 0xFF) / 127.5f - 1.0f);
-                byteBuffer.putFloat(((val >> 8) & 0xFF) / 127.5f - 1.0f);
-                byteBuffer.putFloat(((val >> 16) & 0xFF) / 127.5f - 1.0f);
-            }
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * inputSize * inputSize * 3);
+        byteBuffer.order(ByteOrder.nativeOrder());
+
+        bitmap = Bitmap.createScaledBitmap(bitmap, (int)nw, (int)nh,true);
+        bitmap.getPixels(intValues, 0, inputSize, startx, starty, inputSize, inputSize);
+
+        // Bitmap test = Bitmap.createBitmap(intValues,0,inputSize, inputSize, inputSize, Bitmap.Config.ARGB_8888);
+        for(int i = 0; i < intValues.length; i++) {
+            final int val = intValues[i];
+            byteBuffer.putFloat(((val >> 16) & 0xFF) / 127.5f - 1.0f);
+            byteBuffer.putFloat(((val >> 8) & 0xFF) / 127.5f - 1.0f);
+            byteBuffer.putFloat(((val) & 0xFF) / 127.5f - 1.0f);
         }
+
         return byteBuffer;
     }
 

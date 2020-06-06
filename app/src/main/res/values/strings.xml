@@ -23,10 +23,16 @@
         <item quantity="one">%d tag selected</item>
         <item quantity="other">%d tags selected</item>
     </plurals>
+    <plurals name="keyhwat_tags_found">
+        <item quantity="one">Found %d tag</item>
+        <item quantity="other">Found %d tags</item>
+    </plurals>
     <string name="keywhat_action_custom_tags">About</string>
     <string name="keywhat_action_share">Share</string>
     <string name="keywhat_action_copy">Copy</string>
     <string name="keywhat_share">Get Hashtags</string>
+    <string name="keywhat_confidence">Confidence</string>
+    <string name="keywhat_current_confidence">%d%%</string>
     <string name="keywhat_copy_success">The hashtags has been copied to clipboard.</string>
     <string name="keywhat_error_title">Error</string>
     <string name="keywhat_error_message">An error occurred while executing the algorithm.\n\n%s</string>

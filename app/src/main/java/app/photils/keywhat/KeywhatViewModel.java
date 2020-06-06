@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import app.photils.Keywhat;
+import app.photils.api.PhotilsApi;
 
 public class KeywhatViewModel extends AndroidViewModel {
     public final static String SUGGESTION_KEY = "Suggestions";
@@ -22,7 +23,8 @@ public class KeywhatViewModel extends AndroidViewModel {
     private MutableLiveData<ArrayList<String>> mGroups = new MutableLiveData<>();
     private int mSelectedCounter = 0;
     private HashSet<String> mAvailableCustomTags = new HashSet<>();
-    private List<String> mCachedSuggestions;
+    private List<PhotilsApi.Prediction> mCachedSuggestions;
+    private HashSet<Integer> mSelectedTags = new HashSet<>();
 
 
 
@@ -77,8 +79,13 @@ public class KeywhatViewModel extends AndroidViewModel {
             ArrayList<KeywhatTag> groupedTags = new ArrayList<>();
             int tid = 0;
             for(CustomTag tag : tags) {
-                groupedTags.add(new KeywhatTag(groupid + (tid++), tag.name, tag.isDefault));
-                if(tag.isDefault) mSelectedCounter++;
+                KeywhatTag keywhatTag = new KeywhatTag(groupid + (tid++), tag.name, tag.isDefault);
+                groupedTags.add(keywhatTag);
+                if(tag.isDefault)
+                    mSelectedTags.add(keywhatTag.getTid());
+
+                if(mSelectedTags.contains(keywhatTag.getTid()))
+                    keywhatTag.setSelected(true);
 
                 mAvailableCustomTags.add(tag.name.toLowerCase());
             }
@@ -95,7 +102,7 @@ public class KeywhatViewModel extends AndroidViewModel {
             addSuggestionKeyword(mCachedSuggestions);
     }
 
-    public void addSuggestionKeyword(List<String> tagList) {
+    public void addSuggestionKeyword(List<PhotilsApi.Prediction> tagList) {
         mCachedSuggestions = tagList;
 
         HashMap<Integer, ArrayList<KeywhatTag>> tags = getTags().getValue();
@@ -103,15 +110,17 @@ public class KeywhatViewModel extends AndroidViewModel {
         tagGroup.clear();
 
         int idx = 0;
-        for(String tag : tagList) {
+        for(PhotilsApi.Prediction tag : tagList) {
             // skip suggestion if already exist in custom tags
-            if(mAvailableCustomTags.contains(tag.toLowerCase()))
+            if(mAvailableCustomTags.contains(tag.getLabel().toLowerCase()))
                 continue;
 
-            tagGroup.add(new KeywhatTag(idx++, tag, false));
+            tagGroup.add(new KeywhatTag(idx, tag.getLabel(), mSelectedTags.contains(idx)));
+            idx++;
         }
 
-        getTags().setValue(tags);
+        //getTags().setValue(tags);
+        getTags().postValue(tags);
     }
 
     public void setTagSelected(int tid) {
@@ -122,7 +131,7 @@ public class KeywhatViewModel extends AndroidViewModel {
                 tag.setSelected(true);
         }
 
-        mSelectedCounter++;
+        mSelectedTags.add(tid);
 
         getTags().setValue(tags);
     }
@@ -135,12 +144,14 @@ public class KeywhatViewModel extends AndroidViewModel {
                 tag.setSelected(false);
         }
 
-        mSelectedCounter--;
-
+        mSelectedTags.remove(tid);
         getTags().setValue(tags);
     }
 
     public int getNumberOfSelectedTags() {
-        return mSelectedCounter;
+        return mSelectedTags.size();
+    }
+    public void clearSelectedTags() {
+        mSelectedTags.clear();
     }
 }

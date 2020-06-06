@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity
     private InterstitialAd mInterstitialAd;
     private int mCurrentMenu = R.id.nav_keywhat;
     private static final int CUSTOM_TAG_CODE = 42;
+    private boolean mShowAds = true;
 
 
     public Toolbar getToolbar() {
@@ -234,13 +235,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRequestTags() { }
+    public void onRequestTags() {
+        mShowAds = true;
+    }
 
     @Override
     public void onTagsAvailable() {
-        if(mInterstitialAd.isLoaded())
+        if(mInterstitialAd.isLoaded() && mShowAds) {
             mInterstitialAd.show();
+            mShowAds = false;
+        }
     }
+
 
     /*@Override
     public void onFragmentInteraction(Uri uri) {

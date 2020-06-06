@@ -34,6 +34,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,6 +71,9 @@ public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterLi
     //private ChipCloud mCloud;
     private KeywhatViewModel mKeywhatModel;
     private ImageView mImageView;
+    private SeekBar mConfidenceThreshold;
+    private TextView mCurrentConfidence;
+    private TextView mFoundNumTags;
     private CheckBox mAlias;
     private PhotilsApi mApi;
     private ListView mTagList;
@@ -78,6 +82,7 @@ public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterLi
     private TextView mTvSelectedTags;
 
     private OnKeywhatListener mKeyhwatListener;
+    private List<PhotilsApi.Prediction> mCurrentPredictions;
 
     public Keywhat() { }
 
@@ -237,6 +242,9 @@ public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterLi
         View  v = inflater.inflate(R.layout.fragment_keywhat, container, false);
         mProgressBar = v.findViewById(R.id.keywhat_progress);
         mImageView = v.findViewById(R.id.keywhat_image_view);
+        mConfidenceThreshold = v.findViewById(R.id.keywhat_confidence_slider);
+        mCurrentConfidence = v.findViewById(R.id.keywhat_tv_current_confidence);
+        mFoundNumTags = v.findViewById(R.id.keywhat_tv_num_tags);
         mOverlay = v.findViewById(R.id.keywhat_permission_overlay);
         mAlias = v.findViewById(R.id.keywhat_cb_hashtag);
         mTagList = v.findViewById(R.id.keywhat_tag_list);
@@ -275,6 +283,25 @@ public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterLi
             ArrayList<String> groups = mKeywhatModel.getGroups().getValue();
             mAdapter.setData(groups, integerArrayListHashMap);
         });
+
+        mConfidenceThreshold.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mCurrentConfidence.setText(getString(R.string.keywhat_current_confidence, progress));
+                filterTags();
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        mCurrentConfidence.setText(getString(R.string.keywhat_current_confidence, mConfidenceThreshold.getProgress()));
 
         return v;
     }
@@ -375,20 +402,43 @@ public class Keywhat extends Fragment implements KeywhatAdapter.KeywhatAdapterLi
         this.mKeyhwatListener = listener;
     }
 
+    private void filterTags() {
+        if(mCurrentPredictions == null || mCurrentPredictions.size() == 0)
+            return;
+
+        ArrayList<PhotilsApi.Prediction> tags = new ArrayList<>();
+        float conf = mConfidenceThreshold.getProgress() / 100.0f;
+        for(PhotilsApi.Prediction pred : mCurrentPredictions) {
+            if(pred.getConfidence() < conf)
+                continue;
+
+            tags.add(pred);
+        }
+
+        mKeywhatModel.addSuggestionKeyword(tags);
+        mFoundNumTags.setText(getResources().getQuantityString(
+                R.plurals.keyhwat_tags_found, tags.size(), tags.size()));
+
+        if(mKeyhwatListener != null)
+            mKeyhwatListener.onTagsAvailable();
+    }
 
     private void requestTags(Bitmap bm) {
-        if(this.mKeyhwatListener != null)
+        if(this.mKeyhwatListener != null) {
             this.mKeyhwatListener.onRequestTags();
+        }
 
         toggleProgress(true);
         PhotilsApi.OnTagsReceived callback = new PhotilsApi.OnTagsReceived() {
             @Override
-            public void onSuccess(List<String> tagList) {
-                mKeywhatModel.addSuggestionKeyword(tagList);
-
-                toggleProgress(false);
-                if(mKeyhwatListener != null)
-                    mKeyhwatListener.onTagsAvailable();
+            public void onSuccess(List<PhotilsApi.Prediction> tagList) {
+                mCurrentPredictions = tagList;
+                getActivity().runOnUiThread(() -> {
+                    mKeywhatModel.clearSelectedTags();
+                    filterTags();
+                    toggleProgress(false);
+                    toggleMenuItems();
+                });
             }
 
             @Override
